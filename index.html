@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小林家 W杯2026 特設ページ ⚽</title>
+<style>
+  :root {
+    --pitch: #0a5c2e;
+    --pitch-dark: #073d1f;
+    --gold: #ffd700;
+    --white: #ffffff;
+    --card: rgba(255,255,255,0.10);
+    --card-border: rgba(255,255,255,0.22);
+    --jp-blue: #1a3a8f;
+    --pt-red: #c0392b;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body {
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    background: linear-gradient(160deg, var(--pitch-dark) 0%, var(--pitch) 45%, #0e7a3d 100%);
+    color: var(--white);
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+  .container { max-width: 560px; margin: 0 auto; padding: 0 14px; }
+
+  /* ヘッダー */
+  header {
+    text-align: center;
+    padding: 26px 10px 16px;
+    background:
+      radial-gradient(circle at 50% -40%, rgba(255,215,0,0.25), transparent 60%);
+  }
+  header .trophy { font-size: 52px; }
+  header h1 {
+    font-size: 24px; font-weight: 800; letter-spacing: 1px;
+    margin-top: 4px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  header .sub { font-size: 13px; opacity: 0.85; margin-top: 6px; line-height: 1.5; }
+
+  /* カウントダウン */
+  .countdown {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid var(--gold);
+    border-radius: 16px;
+    padding: 14px;
+    text-align: center;
+    margin: 10px 0 4px;
+  }
+  .countdown .label { font-size: 13px; color: var(--gold); font-weight: 700; }
+  .countdown .match { font-size: 17px; font-weight: 800; margin: 6px 0; }
+  .countdown .timer { font-size: 26px; font-weight: 800; letter-spacing: 2px; font-variant-numeric: tabular-nums; }
+  .countdown .when { font-size: 12px; opacity: 0.8; margin-top: 4px; }
+  .countdown.live { animation: pulse 1.2s infinite; border-color: #ff5252; }
+  @keyframes pulse { 0%,100%{box-shadow:0 0 0 rgba(255,82,82,0);} 50%{box-shadow:0 0 18px rgba(255,82,82,0.7);} }
+
+  /* セクション */
+  section { margin-top: 26px; }
+  h2 {
+    font-size: 19px; font-weight: 800;
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--gold);
+  }
+  h2 .emoji { font-size: 22px; }
+
+  /* 優勝予想 */
+  .rule-banner {
+    background: linear-gradient(90deg, #b8860b, #ffd700, #b8860b);
+    color: #3a2a00;
+    font-weight: 800;
+    text-align: center;
+    border-radius: 12px;
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+  }
+  .predict-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .predict-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 12px;
+    text-align: center;
+  }
+  .predict-card .name { font-size: 15px; font-weight: 700; }
+  .predict-card .flag { font-size: 34px; margin: 6px 0 2px; }
+  .predict-card .team { font-size: 14px; font-weight: 800; }
+  .predict-card.undecided { opacity: 0.65; border-style: dashed; }
+  .predict-card.undecided .team { color: #ccc; font-weight: 600; }
+  .predict-card.jp { border-color: #6e8fe8; background: rgba(26,58,143,0.35); }
+  .predict-card.pt { border-color: #e8826e; background: rgba(192,57,43,0.35); }
+
+  /* 試合カード */
+  .team-block { margin-bottom: 18px; }
+  .team-head {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 12px 12px 0 0;
+    padding: 10px 14px;
+    font-weight: 800; font-size: 16px;
+  }
+  .team-head .bigflag { font-size: 28px; }
+  .team-head .who { margin-left: auto; font-size: 12px; font-weight: 600; background: var(--gold); color:#3a2a00; padding: 3px 10px; border-radius: 999px; }
+  .match-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-top: none;
+    padding: 12px 14px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .match-card:last-of-type { border-radius: 0 0 12px 12px; }
+  .match-card .date {
+    text-align: center; min-width: 74px;
+    background: rgba(0,0,0,0.3); border-radius: 10px; padding: 6px 4px;
+  }
+  .match-card .date .d { font-size: 15px; font-weight: 800; }
+  .match-card .date .t { font-size: 17px; font-weight: 800; color: var(--gold); }
+  .match-card .info { flex: 1; }
+  .match-card .vs { font-size: 15px; font-weight: 800; }
+  .match-card .venue { font-size: 11.5px; opacity: 0.8; margin-top: 3px; }
+  .match-card .tv { font-size: 11.5px; color: #9fe8b0; margin-top: 2px; }
+  .feature-box {
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--card-border);
+    border-radius: 0 0 12px 12px;
+    border-top: 1px dashed var(--card-border);
+    padding: 12px 14px;
+    font-size: 13.5px; line-height: 1.7;
+  }
+  .feature-box b { color: var(--gold); }
+
+  /* クイズ */
+  .quiz-box {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 16px;
+  }
+  .quiz-progress { font-size: 13px; color: var(--gold); font-weight: 700; margin-bottom: 8px; }
+  .quiz-q { font-size: 16px; font-weight: 800; line-height: 1.6; margin-bottom: 14px; min-height: 52px; }
+  .quiz-opts { display: grid; gap: 10px; }
+  .quiz-opt {
+    background: rgba(255,255,255,0.12);
+    border: 1.5px solid var(--card-border);
+    border-radius: 12px;
+    padding: 13px 14px;
+    font-size: 15px; font-weight: 600;
+    color: var(--white);
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.08s;
+    width: 100%;
+  }
+  .quiz-opt:active { transform: scale(0.97); }
+  .quiz-opt.correct { background: #2e7d32; border-color: #81c784; }
+  .quiz-opt.wrong { background: #b03030; border-color: #ef9a9a; }
+  .quiz-explain {
+    margin-top: 12px; font-size: 13.5px; line-height: 1.7;
+    background: rgba(0,0,0,0.3); border-radius: 10px; padding: 10px 12px;
+    display: none;
+  }
+  .quiz-next, .big-btn {
+    display: block; width: 100%;
+    margin-top: 14px;
+    background: var(--gold); color: #3a2a00;
+    font-size: 16px; font-weight: 800;
+    border: none; border-radius: 12px;
+    padding: 14px;
+    cursor: pointer;
+    transition: transform 0.08s;
+  }
+  .quiz-next:active, .big-btn:active { transform: scale(0.97); }
+  .quiz-score { text-align: center; font-size: 17px; font-weight: 800; line-height: 1.8; }
+  .quiz-score .big { font-size: 42px; color: var(--gold); display: block; }
+
+  /* 豆知識・おみくじ */
+  .tip-box {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+  }
+  .tip-text {
+    font-size: 15px; font-weight: 700; line-height: 1.8;
+    min-height: 76px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tip-tag { display:inline-block; font-size: 11px; background: var(--gold); color:#3a2a00; font-weight:800; border-radius:999px; padding: 2px 10px; margin-bottom: 8px; }
+
+  .omikuji-result { font-size: 15px; line-height: 2; min-height: 100px; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .omikuji-result .rank { font-size: 40px; font-weight: 800; color: var(--gold); }
+
+  /* 得点バトル表 */
+  .battle-note { font-size: 13px; line-height: 1.8; background: rgba(0,0,0,0.25); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; }
+  table.battle {
+    width: 100%; border-collapse: collapse; font-size: 13.5px;
+    background: var(--card); border-radius: 12px; overflow: hidden;
+  }
+  table.battle th, table.battle td {
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 9px 6px; text-align: center;
+  }
+  table.battle th { background: rgba(0,0,0,0.35); color: var(--gold); font-size: 12.5px; }
+  table.battle td.name-col { font-weight: 800; }
+
+  footer { text-align: center; font-size: 11px; opacity: 0.6; margin-top: 40px; line-height: 1.8; }
+  .ball-line { text-align:center; font-size: 20px; letter-spacing: 12px; margin-top: 18px; opacity: 0.5; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="trophy">🏆</div>
+    <h1>小林家 W杯2026 特設ページ</h1>
+    <div class="sub">FIFAワールドカップ 2026（アメリカ・カナダ・メキシコ）<br>2026.6.11 開幕 — 7.19 決勝　全48か国</div>
+  </header>
+
+  <!-- カウントダウン -->
+  <div class="countdown" id="countdown">
+    <div class="label">⏰ 次の注目試合まで</div>
+    <div class="match" id="cd-match">読み込み中…</div>
+    <div class="timer" id="cd-timer">--:--:--</div>
+    <div class="when" id="cd-when"></div>
+  </div>
+
+  <!-- 優勝予想 -->
+  <section>
+    <h2><span class="emoji">🔮</span>優勝予想バトル</h2>
+    <div class="rule-banner">🎁 優勝チームを当てた人が プレゼント総取り！ 🎁</div>
+    <div class="predict-grid">
+      <div class="predict-card undecided">
+        <div class="name">👨 洋</div>
+        <div class="flag">❓</div>
+        <div class="team">考え中…</div>
+      </div>
+      <div class="predict-card undecided">
+        <div class="name">👩 ヒトミ</div>
+        <div class="flag">❓</div>
+        <div class="team">考え中…</div>
+      </div>
+      <div class="predict-card undecided">
+        <div class="name">🧑 綾人</div>
+        <div class="flag">❓</div>
+        <div class="team">考え中…</div>
+      </div>
+      <div class="predict-card undecided">
+        <div class="name">🧒 寛太</div>
+        <div class="flag">❓</div>
+        <div class="team">考え中…</div>
+      </div>
+      <div class="predict-card pt">
+        <div class="name">🧒 健介</div>
+        <div class="flag">🇵🇹</div>
+        <div class="team">ポルトガル</div>
+      </div>
+      <div class="predict-card jp">
+        <div class="name">🧒 鉄平</div>
+        <div class="flag">🇯🇵</div>
+        <div class="team">日本</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 試合日程 -->
+  <section>
+    <h2><span class="emoji">📅</span>予想チームの試合日程（日本時間）</h2>
+
+    <div class="team-block">
+      <div class="team-head"><span class="bigflag">🇯🇵</span>日本（グループF）<span class="who">鉄平の予想</span></div>
+      <div class="match-card">
+        <div class="date"><div class="d">6/15<small>(月)</small></div><div class="t">5:00</div></div>
+        <div class="info">
+          <div class="vs">vs オランダ 🇳🇱</div>
+          <div class="venue">AT&Tスタジアム（アメリカ・ダラス）</div>
+          <div class="tv">📺 NHK総合 / DAZN無料配信</div>
+        </div>
+      </div>
+      <div class="match-card">
+        <div class="date"><div class="d">6/21<small>(日)</small></div><div class="t">13:00</div></div>
+        <div class="info">
+          <div class="vs">vs チュニジア 🇹🇳</div>
+          <div class="venue">モンテレースタジアム（メキシコ）</div>
+          <div class="tv">📺 日本テレビ / DAZN無料配信 — 日曜昼！家族全員で観られる🎉</div>
+        </div>
+      </div>
+      <div class="match-card">
+        <div class="date"><div class="d">6/26<small>(金)</small></div><div class="t">8:00</div></div>
+        <div class="info">
+          <div class="vs">vs スウェーデン 🇸🇪</div>
+          <div class="venue">AT&Tスタジアム（アメリカ・ダラス）</div>
+          <div class="tv">📺 NHK BS / DAZN無料配信</div>
+        </div>
+      </div>
+      <div class="feature-box">
+        <b>チームの特徴：</b>堅い守備からの高速カウンターが武器。<b>三笘薫</b>のドリブル突破、<b>久保建英</b>の左足、キャプテン<b>遠藤航</b>の潰しが見どころ。前回2022年大会ではドイツとスペインを撃破。今大会の目標は史上初の<b>ベスト8超え</b>。初戦のオランダはFIFAランク上位の強豪で、ここが最大のヤマ場！
+      </div>
+    </div>
+
+    <div class="team-block">
+      <div class="team-head"><span class="bigflag">🇵🇹</span>ポルトガル（グループK）<span class="who">健介の予想</span></div>
+      <div class="match-card">
+        <div class="date"><div class="d">6/18<small>(木)</small></div><div class="t">2:00</div></div>
+        <div class="info">
+          <div class="vs">vs コンゴ民主共和国 🇨🇩</div>
+          <div class="venue">NRGスタジアム（アメリカ・ヒューストン）</div>
+          <div class="tv">🌙 深夜2時キックオフ。録画推奨！</div>
+        </div>
+      </div>
+      <div class="match-card">
+        <div class="date"><div class="d">6/24<small>(水)</small></div><div class="t">2:00</div></div>
+        <div class="info">
+          <div class="vs">vs ウズベキスタン 🇺🇿</div>
+          <div class="venue">NRGスタジアム（アメリカ・ヒューストン）</div>
+          <div class="tv">🌙 こちらも深夜2時。健介がんばれ…！</div>
+        </div>
+      </div>
+      <div class="match-card">
+        <div class="date"><div class="d">6/28<small>(日)</small></div><div class="t">8:30</div></div>
+        <div class="info">
+          <div class="vs">vs コロンビア 🇨🇴</div>
+          <div class="venue">ハードロックスタジアム（アメリカ・マイアミ）</div>
+          <div class="tv">☀️ 日曜朝8:30！朝ごはん観戦にぴったり</div>
+        </div>
+      </div>
+      <div class="feature-box">
+        <b>チームの特徴：</b>タレント軍団。41歳の<b>クリスティアーノ・ロナウド</b>がラストW杯で悲願の初優勝を狙う。司令塔<b>ブルーノ・フェルナンデス</b>、ドリブラー<b>ラファエル・レオン</b>など攻撃陣は世界トップ級。2025年にはネーションズリーグ優勝。グループKの最大のライバルはコロンビア。
+      </div>
+    </div>
+  </section>
+
+  <!-- 試合予想バトル -->
+  <section>
+    <h2><span class="emoji">⚔️</span>試合ごとの勝敗予想バトル</h2>
+    <div class="battle-note">
+      優勝予想とは別に、<b>注目試合の勝敗をみんなで予想</b>してポイントを競おう！<br>
+      ✅ 勝敗的中 … <b>+10点</b>　🎯 スコアまで的中 … <b>+30点</b><br>
+      📈 大会終了時の1位には「夕食リクエスト権」などいかが？<br>
+      （予想はリビングのホワイトボードか家族LINEで宣言 → 結果をこの表に記入）
+    </div>
+    <table class="battle">
+      <tr><th>試合</th><th>洋</th><th>ヒトミ</th><th>綾人</th><th>寛太</th><th>健介</th><th>鉄平</th></tr>
+      <tr><td>🇯🇵 vs 🇳🇱<br>6/15</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>🇵🇹 vs 🇨🇩<br>6/18</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>🇯🇵 vs 🇹🇳<br>6/21</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>🇵🇹 vs 🇺🇿<br>6/24</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>🇯🇵 vs 🇸🇪<br>6/26</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td>🇵🇹 vs 🇨🇴<br>6/28</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="name-col">合計点</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+    </table>
+  </section>
+
+  <!-- クイズ -->
+  <section>
+    <h2><span class="emoji">🧠</span>W杯クイズ（全10問）</h2>
+    <div class="quiz-box" id="quiz">
+      <div class="quiz-progress" id="quiz-progress">第1問 / 10</div>
+      <div class="quiz-q" id="quiz-q"></div>
+      <div class="quiz-opts" id="quiz-opts"></div>
+      <div class="quiz-explain" id="quiz-explain"></div>
+      <button class="quiz-next" id="quiz-next" style="display:none">次の問題 ▶</button>
+    </div>
+  </section>
+
+  <!-- 豆知識 -->
+  <section>
+    <h2><span class="emoji">💡</span>サッカーが上手くなる豆知識</h2>
+    <div class="tip-box">
+      <div><span class="tip-tag" id="tip-tag">きほん</span></div>
+      <div class="tip-text" id="tip-text">ボタンを押すと、プレーに役立つ豆知識がランダムで出るよ！</div>
+      <button class="big-btn" onclick="showTip()">⚽ 豆知識を引く</button>
+    </div>
+  </section>
+
+  <!-- おみくじ -->
+  <section>
+    <h2><span class="emoji">⛩️</span>本日のサッカーおみくじ</h2>
+    <div class="tip-box">
+      <div class="omikuji-result" id="omikuji">
+        <div>今日の運勢とラッキープレーを占おう！</div>
+      </div>
+      <button class="big-btn" onclick="drawOmikuji()">🎴 おみくじを引く</button>
+    </div>
+  </section>
+
+  <div class="ball-line">⚽⚽⚽</div>
+  <footer>
+    小林家ワールドカップ委員会 2026<br>
+    日程は日本時間。変更の可能性あり（公式: FIFA / JFA）
+  </footer>
+</div>
+
+<script>
+/* ===== カウントダウン ===== */
+const matches = [
+  { name: "🇯🇵 日本 vs オランダ 🇳🇱",          when: "2026-06-15T05:00:00+09:00" },
+  { name: "🇵🇹 ポルトガル vs コンゴ民主 🇨🇩",   when: "2026-06-18T02:00:00+09:00" },
+  { name: "🇯🇵 日本 vs チュニジア 🇹🇳",        when: "2026-06-21T13:00:00+09:00" },
+  { name: "🇵🇹 ポルトガル vs ウズベキスタン 🇺🇿", when: "2026-06-24T02:00:00+09:00" },
+  { name: "🇯🇵 日本 vs スウェーデン 🇸🇪",      when: "2026-06-26T08:00:00+09:00" },
+  { name: "🇵🇹 ポルトガル vs コロンビア 🇨🇴",   when: "2026-06-28T08:30:00+09:00" },
+];
+const MATCH_LEN = 2.5 * 3600 * 1000; // 試合中とみなす長さ
+
+function fmtWhen(d) {
+  const w = ["日","月","火","水","木","金","土"][d.getDay()];
+  const mm = String(d.getMinutes()).padStart(2,"0");
+  return `${d.getMonth()+1}/${d.getDate()}(${w}) ${d.getHours()}:${mm} キックオフ`;
+}
+function tick() {
+  const now = Date.now();
+  const box = document.getElementById("countdown");
+  // 試合中？
+  const live = matches.find(m => {
+    const t = new Date(m.when).getTime();
+    return now >= t && now < t + MATCH_LEN;
+  });
+  if (live) {
+    box.classList.add("live");
+    document.getElementById("cd-match").textContent = live.name;
+    document.getElementById("cd-timer").textContent = "🔴 試合中！";
+    document.getElementById("cd-when").textContent = "テレビをつけろー！📺";
+    return;
+  }
+  box.classList.remove("live");
+  const next = matches.find(m => new Date(m.when).getTime() > now);
+  if (!next) {
+    document.getElementById("cd-match").textContent = "グループステージ全試合終了！";
+    document.getElementById("cd-timer").textContent = "🏆";
+    document.getElementById("cd-when").textContent = "決勝トーナメントの日程が決まったら更新します";
+    return;
+  }
+  const d = new Date(next.when);
+  let diff = Math.floor((d.getTime() - now) / 1000);
+  const days = Math.floor(diff / 86400); diff %= 86400;
+  const h = Math.floor(diff / 3600); diff %= 3600;
+  const m = Math.floor(diff / 60);
+  const s = diff % 60;
+  document.getElementById("cd-match").textContent = next.name;
+  document.getElementById("cd-timer").textContent =
+    (days > 0 ? `${days}日 ` : "") +
+    `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  document.getElementById("cd-when").textContent = fmtWhen(d);
+}
+tick();
+setInterval(tick, 1000);
+
+/* ===== クイズ ===== */
+const quiz = [
+  { q: "W杯2026に出場する国の数は？", opts: ["32か国", "40か国", "48か国"], a: 2,
+    ex: "今大会から32→48か国に拡大！史上最大のW杯です。" },
+  { q: "W杯2026の開催国は？", opts: ["アメリカだけ", "アメリカ・カナダ・メキシコの3か国", "アメリカとブラジル"], a: 1,
+    ex: "史上初の3か国共同開催。決勝はニューヨーク近郊のメットライフ・スタジアムで7/19！" },
+  { q: "日本の初戦（6/15朝5時）の相手は？", opts: ["オランダ", "スウェーデン", "チュニジア"], a: 0,
+    ex: "グループF最強の相手と初戦で激突。早起き必須！" },
+  { q: "サッカーは1チーム何人で戦う？", opts: ["10人", "11人", "12人"], a: 1,
+    ex: "GK1人＋フィールドプレーヤー10人の11人。" },
+  { q: "W杯で一番たくさん優勝している国は？", opts: ["ドイツ", "アルゼンチン", "ブラジル"], a: 2,
+    ex: "ブラジルが5回で最多。ドイツとイタリアが4回、アルゼンチンが3回。" },
+  { q: "クリスティアーノ・ロナウドの国はどこ？", opts: ["スペイン", "ポルトガル", "ブラジル"], a: 1,
+    ex: "健介の予想チーム！41歳のロナウドにとって最後のW杯と言われています。" },
+  { q: "前回2022年大会で日本が勝った「強豪2か国」は？", opts: ["ドイツとスペイン", "フランスとブラジル", "イングランドとイタリア"], a: 0,
+    ex: "どちらも優勝経験国からの大金星！「ドーハの奇跡」と呼ばれました。" },
+  { q: "「ハットトリック」ってどういう意味？", opts: ["1試合で3点取ること", "帽子を投げて応援すること", "3試合連続で勝つこと"], a: 0,
+    ex: "1人の選手が1試合で3得点すること。昔のクリケットで達成者に帽子を贈ったのが由来。" },
+  { q: "「オフサイド」になるのはどんなとき？", opts: ["GKより前でボールを受けたとき", "パスが出た瞬間、相手の後ろから2人目より前にいてプレーに関わったとき", "相手を3人抜いたとき"], a: 1,
+    ex: "待ち伏せ禁止のルール。パスが出た瞬間の位置がポイント。W杯では半自動オフサイド判定テクノロジーが使われます。" },
+  { q: "日本代表のキャプテンで「世界一の潰し屋」と呼ばれる選手は？", opts: ["三笘薫", "久保建英", "遠藤航"], a: 2,
+    ex: "遠藤航選手。相手の攻撃を奪い取るデュエル（1対1）の強さは世界トップクラス！" },
+];
+let qIdx = 0, qScore = 0, qAnswered = false;
+function renderQuiz() {
+  qAnswered = false;
+  const item = quiz[qIdx];
+  document.getElementById("quiz-progress").textContent = `第${qIdx+1}問 / ${quiz.length}　（正解 ${qScore}問）`;
+  document.getElementById("quiz-q").textContent = item.q;
+  const opts = document.getElementById("quiz-opts");
+  opts.innerHTML = "";
+  item.opts.forEach((t, i) => {
+    const b = document.createElement("button");
+    b.className = "quiz-opt";
+    b.textContent = ["Ａ","Ｂ","Ｃ"][i] + "　" + t;
+    b.onclick = () => answer(i, b);
+    opts.appendChild(b);
+  });
+  document.getElementById("quiz-explain").style.display = "none";
+  document.getElementById("quiz-next").style.display = "none";
+}
+function answer(i, btn) {
+  if (qAnswered) return;
+  qAnswered = true;
+  const item = quiz[qIdx];
+  const btns = document.querySelectorAll(".quiz-opt");
+  btns[item.a].classList.add("correct");
+  if (i === item.a) { qScore++; } else { btn.classList.add("wrong"); }
+  const ex = document.getElementById("quiz-explain");
+  ex.innerHTML = (i === item.a ? "⭕ <b>正解！</b> " : "❌ <b>ざんねん…</b> ") + item.ex;
+  ex.style.display = "block";
+  const next = document.getElementById("quiz-next");
+  next.textContent = qIdx === quiz.length - 1 ? "結果を見る 🏁" : "次の問題 ▶";
+  next.style.display = "block";
+}
+document.getElementById("quiz-next").onclick = () => {
+  qIdx++;
+  if (qIdx < quiz.length) { renderQuiz(); return; }
+  // 結果
+  let msg, emoji;
+  if (qScore === 10)      { emoji = "🏆"; msg = "パーフェクト！キミが小林家のW杯博士だ！"; }
+  else if (qScore >= 8)   { emoji = "🥇"; msg = "すごい！代表監督レベル！"; }
+  else if (qScore >= 5)   { emoji = "⚽"; msg = "なかなかやるね！試合を観ればもっと詳しくなる！"; }
+  else                    { emoji = "🌱"; msg = "これから一緒に詳しくなろう！"; }
+  document.getElementById("quiz").innerHTML =
+    `<div class="quiz-score">${emoji}<span class="big">${qScore} / ${quiz.length}</span>${msg}</div>
+     <button class="big-btn" onclick="location.reload()">もう一回チャレンジ 🔄</button>`;
+};
+renderQuiz();
+
+/* ===== 豆知識 ===== */
+const tips = [
+  { tag:"トラップ", t:"ボールが来る前に首を振って周りを見る（スキャン）。プロは1分間に何十回も首を振っているよ。" },
+  { tag:"トラップ", t:"ファーストタッチは「止める」より「次にプレーしたい方向へ置く」。それだけで相手を1人かわせる。" },
+  { tag:"パス", t:"インサイドパスは軸足のつま先を「パスを出したい方向」に向けるとまっすぐ転がる。" },
+  { tag:"パス", t:"パスは味方の「利き足側」に出すと、次のプレーが速くなる。" },
+  { tag:"シュート", t:"シュートは強さよりコース。GKの届かない「ゴールの四隅」を狙おう。" },
+  { tag:"シュート", t:"焦ってふかしがちな人は、ボールの真ん中より少し上を蹴る意識で低い弾道になる。" },
+  { tag:"ドリブル", t:"ドリブルは「ボールを触る回数」が多いほど奪われにくい。細かいタッチで運ぼう。" },
+  { tag:"ドリブル", t:"相手を抜く瞬間はスピードの変化が一番効く。ゆっくり→一気に加速！" },
+  { tag:"ディフェンス", t:"守るときは「相手とゴールを結ぶ線上」に立つのが基本。ボールだけ見て飛び込まない。" },
+  { tag:"ディフェンス", t:"相手と1対1のときは半身（はんみ）で構えると、どちらに行かれても付いていける。" },
+  { tag:"ポジショニング", t:"ボールを持っていない時間は約97%。「ボールがない時にどう動くか」が上手さの差になる。" },
+  { tag:"ポジショニング", t:"味方がボールを持ったら「パスコースを2つ作る」動きを意識しよう。" },
+  { tag:"体の使い方", t:"速く走るより「速く止まれる」選手が上手い。減速とターンの練習をしよう。" },
+  { tag:"体の使い方", t:"ジャンプのヘディングは「腕を使ってバランス」を取ると高く跳べて当たり負けしない。" },
+  { tag:"コンディション", t:"試合の2時間前までにおにぎりやバナナでエネルギー補給。直前に食べすぎない。" },
+  { tag:"コンディション", t:"のどが渇く前に水分補給。「渇いた」と感じた時にはもう遅い。" },
+  { tag:"メンタル", t:"ミスした後の10秒が大事。下を向かずにすぐ次のポジションへ走る選手が信頼される。" },
+  { tag:"メンタル", t:"声を出す選手はそれだけで上手く見えるし、実際にチームを助けている。「マーク！」「フリー！」を言ってみよう。" },
+];
+let lastTip = -1;
+function showTip() {
+  let i;
+  do { i = Math.floor(Math.random() * tips.length); } while (i === lastTip);
+  lastTip = i;
+  document.getElementById("tip-tag").textContent = tips[i].tag;
+  document.getElementById("tip-text").textContent = tips[i].t;
+}
+
+/* ===== おみくじ ===== */
+const ranks = ["大吉","中吉","小吉","吉","末吉"];
+const luckyPlay = ["ボレーシュート","スライディング","ヘディング","ワンツーパス","ロングシュート","ドリブル突破","スルーパス","セービング","オーバーヘッド","フリーキック"];
+const luckyItem = ["すね当て","新しいソックス","スポーツドリンク","タオル","芝のにおい","背番号10","左足","キャプテンマーク"];
+const advice = [
+  "今日は積極的にシュートを打つと良いことがある",
+  "仲間への声かけが幸運を呼ぶ",
+  "いつもより5分早くアップを始めると吉",
+  "利き足じゃない方の足で蹴る練習をすると成長デー",
+  "今日は守備でチームを救う日",
+  "リフティングの最高記録が出るかも",
+  "あいさつを大きな声でするとパスが回ってくる",
+  "靴ひもをしっかり結び直すと集中力アップ",
+];
+function drawOmikuji() {
+  const r = ranks[Math.floor(Math.random()*ranks.length)];
+  const p = luckyPlay[Math.floor(Math.random()*luckyPlay.length)];
+  const it = luckyItem[Math.floor(Math.random()*luckyItem.length)];
+  const ad = advice[Math.floor(Math.random()*advice.length)];
+  document.getElementById("omikuji").innerHTML =
+    `<div class="rank">${r}</div>
+     <div>⚽ ラッキープレー：<b>${p}</b></div>
+     <div>🎒 ラッキーアイテム：<b>${it}</b></div>
+     <div style="font-size:13px; opacity:0.9; margin-top:4px;">${ad}</div>`;
+}
+</script>
+</body>
+</html>
