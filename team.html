@@ -72,6 +72,21 @@
 
   .outlook{background:rgba(0,0,0,0.3);border:1px solid var(--gold);border-radius:14px;
     padding:13px 15px;font-size:14px;line-height:1.7;}
+
+  /* 国紹介（Tむけ） */
+  .kid-tag{font-size:11px;font-weight:700;background:#42a5f5;color:#04243f;padding:2px 9px;border-radius:999px;margin-left:8px;vertical-align:middle;}
+  .country-box{background:rgba(66,165,245,0.12);border:1px solid #6fb7f0;border-radius:14px;padding:14px;}
+  .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .ci{background:rgba(0,0,0,0.22);border-radius:10px;padding:9px 11px;}
+  .cl{font-size:11px;opacity:0.85;}
+  .cv{font-size:14px;font-weight:700;margin-top:2px;}
+  .chello{margin:11px 0 8px;font-size:14px;text-align:center;}
+  .chello b{color:var(--gold);font-size:16px;}
+  .ckid{font-size:13.5px;line-height:1.75;background:rgba(0,0,0,0.18);border-radius:10px;padding:10px 12px;}
+  .map-btn{display:block;margin-top:12px;text-align:center;background:#42a5f5;color:#04243f;
+    text-decoration:none;font-weight:800;font-size:15px;padding:13px;border-radius:12px;transition:transform 0.08s;}
+  .map-btn:active{transform:scale(0.97);}
+  .mini-map{text-decoration:none;font-size:13px;margin-left:3px;}
   .err{text-align:center;padding:60px 20px;font-size:16px;}
   footer{text-align:center;font-size:11px;opacity:0.6;margin-top:34px;line-height:1.8;}
 </style>
@@ -123,10 +138,27 @@ if(!t){
   const matchHtml = t.matches.map(m=>{
     const rc = resClass(m.res);
     const badge = m.res ? '<span class="mr '+rc+'">'+m.res+'</span>' : '<span class="mr none">これから</span>';
+    const oppMap = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(m.opp);
     return '<div class="m"><div class="md">'+m.dj+'</div>'+
-      '<div class="mo">vs '+m.opp+' '+m.flag+ (m.note?'<span class="mn">'+(m.res?'✅ ':'')+m.note+'</span>':'') +'</div>'+
+      '<div class="mo">vs '+m.opp+' '+m.flag+' <a class="mini-map" href="'+oppMap+'" target="_blank" rel="noopener" title="地図で見る">🗺️</a>'+ (m.note?'<span class="mn">'+(m.res?'✅ ':'')+m.note+'</span>':'') +'</div>'+
       badge+'</div>';
   }).join("");
+
+  const ct = t.country;
+  const mapUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(ct.map);
+  const countryHtml =
+    '<h2>🌍 この国ってどんな国？<span class="kid-tag">こども向け</span></h2>'+
+    '<div class="country-box">'+
+      '<div class="cgrid">'+
+        '<div class="ci"><div class="cl">🗺️ どこにある？</div><div class="cv">'+ct.continent+'</div></div>'+
+        '<div class="ci"><div class="cl">🏙️ しゅと</div><div class="cv">'+ct.capital+'</div></div>'+
+        '<div class="ci"><div class="cl">💬 ことば</div><div class="cv">'+ct.lang+'</div></div>'+
+        '<div class="ci"><div class="cl">🍽️ たべもの</div><div class="cv">'+ct.food+'</div></div>'+
+      '</div>'+
+      '<div class="chello">👋 あいさつ：<b>'+ct.hello+'</b></div>'+
+      '<div class="ckid">'+ct.kidFact+'</div>'+
+      '<a class="map-btn" href="'+mapUrl+'" target="_blank" rel="noopener">🗺️ 地図で「'+t.name+'」の場所を見る →</a>'+
+    '</div>';
 
   app.innerHTML =
     '<div class="hero" style="background:radial-gradient(circle at 50% 0%, '+hexA(t.color,0.55)+', transparent 70%);">'+
@@ -141,6 +173,8 @@ if(!t){
       '<div class="stat"><div class="v">'+t.titles+'回</div><div class="l">W杯優勝</div></div>'+
       '<div class="stat"><div class="v">'+t.group.replace("グループ","")+'</div><div class="l">グループ</div></div>'+
     '</div>'+
+
+    countryHtml+
 
     '<h2>📝 チームの特徴</h2><div class="box">'+t.style+'</div>'+
 
