@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>チーム情報 ⚽</title>
+<style>
+  :root{
+    --pitch:#0a5c2e; --pitch-dark:#073d1f; --gold:#ffd700; --white:#fff;
+    --card:rgba(255,255,255,0.10); --card-border:rgba(255,255,255,0.22);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{
+    font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+    background:linear-gradient(160deg,var(--pitch-dark) 0%,var(--pitch) 45%,#0e7a3d 100%);
+    color:var(--white);min-height:100vh;padding-bottom:60px;
+  }
+  .container{max-width:560px;margin:0 auto;padding:0 14px;}
+  .back{display:inline-flex;align-items:center;gap:6px;margin:16px 0 6px;
+    background:rgba(0,0,0,0.3);border:1px solid var(--card-border);color:var(--white);
+    text-decoration:none;font-size:14px;font-weight:700;padding:9px 16px;border-radius:999px;}
+  .back:active{transform:scale(0.97);}
+
+  .hero{text-align:center;padding:18px 10px 10px;border-radius:18px;margin-top:6px;}
+  .hero .flag{font-size:64px;line-height:1;}
+  .hero h1{font-size:27px;font-weight:800;margin-top:6px;}
+  .hero .nick{font-size:13px;opacity:0.9;margin-top:4px;}
+  .hero .who{display:inline-block;margin-top:8px;font-size:12px;font-weight:800;
+    background:var(--gold);color:#3a2a00;padding:3px 12px;border-radius:999px;}
+
+  .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0;}
+  .stat{background:var(--card);border:1px solid var(--card-border);border-radius:12px;
+    padding:10px 4px;text-align:center;}
+  .stat .v{font-size:22px;font-weight:800;color:var(--gold);}
+  .stat .l{font-size:11px;opacity:0.85;margin-top:2px;}
+
+  h2{font-size:17px;font-weight:800;display:flex;align-items:center;gap:8px;
+    margin:22px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--gold);}
+  .box{background:var(--card);border:1px solid var(--card-border);border-radius:14px;
+    padding:13px 15px;font-size:14px;line-height:1.75;}
+  .stars{display:flex;flex-wrap:wrap;gap:8px;}
+  .star{background:rgba(255,215,0,0.15);border:1px solid var(--gold);border-radius:999px;
+    padding:7px 13px;font-size:14px;font-weight:700;}
+  ul.facts{list-style:none;display:grid;gap:9px;}
+  ul.facts li{background:var(--card);border:1px solid var(--card-border);border-radius:12px;
+    padding:11px 13px;font-size:13.5px;line-height:1.65;}
+  ul.facts li::before{content:"⚽ ";}
+
+  /* フォーメーション図 */
+  .formation-wrap{background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:14px;}
+  .form-name{text-align:center;font-size:20px;font-weight:800;color:var(--gold);margin-bottom:4px;}
+  .form-desc{text-align:center;font-size:12.5px;opacity:0.85;margin-bottom:12px;}
+  .pitch{background:linear-gradient(0deg,#0b6e36,#0a5c2e);border:2px solid rgba(255,255,255,0.4);
+    border-radius:10px;padding:14px 6px;display:flex;flex-direction:column-reverse;gap:14px;position:relative;}
+  .pitch::before{content:"";position:absolute;top:50%;left:6px;right:6px;height:1px;background:rgba(255,255,255,0.35);}
+  .pitch::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:46px;height:46px;border:1px solid rgba(255,255,255,0.35);border-radius:50%;}
+  .line{display:flex;justify-content:space-around;align-items:center;position:relative;z-index:1;}
+  .dot{width:24px;height:24px;border-radius:50%;background:var(--gold);border:2px solid #fff;
+    box-shadow:0 1px 4px rgba(0,0,0,0.4);}
+  .dot.gk{background:#42a5f5;}
+
+  .match-list{display:grid;gap:8px;}
+  .m{display:flex;align-items:center;gap:10px;background:var(--card);
+    border:1px solid var(--card-border);border-radius:12px;padding:10px 12px;}
+  .m .md{min-width:96px;font-size:12.5px;font-weight:700;}
+  .m .mo{flex:1;font-size:14px;font-weight:700;}
+  .m .mr{font-size:14px;font-weight:800;padding:3px 9px;border-radius:8px;}
+  .m .mr.win{background:#2e7d32;} .m .mr.draw{background:#b8902a;} .m .mr.loss{background:#b03030;}
+  .m .mr.none{background:rgba(255,255,255,0.12);font-weight:700;font-size:11px;opacity:0.8;}
+  .m .mn{font-size:11px;color:#ffd54f;display:block;margin-top:2px;}
+
+  .outlook{background:rgba(0,0,0,0.3);border:1px solid var(--gold);border-radius:14px;
+    padding:13px 15px;font-size:14px;line-height:1.7;}
+  .err{text-align:center;padding:60px 20px;font-size:16px;}
+  footer{text-align:center;font-size:11px;opacity:0.6;margin-top:34px;line-height:1.8;}
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="back" href="index.html">← トップにもどる</a>
+  <div id="app"></div>
+  <footer>データは日本時間・第1節終了時点。変更の可能性あり（公式: FIFA / JFA）</footer>
+</div>
+
+<script src="teams-data.js"></script>
+<script>
+function q(name){ return new URLSearchParams(location.search).get(name); }
+function resClass(r){ if(!r) return "none"; if(r[0]==="◯"||r[0]==="○") return "win"; if(r[0]==="△") return "draw"; if(r[0]==="✕"||r[0]==="×") return "loss"; return "none"; }
+
+function renderFormation(str){
+  // "4-2-3-1" → GK(下) + 各ラインを下から上へ。攻撃が上。
+  const lines = str.split("-").map(n=>parseInt(n,10));
+  let html = '<div class="pitch">';
+  // 最前線（攻撃）から上に積みたいので、column-reverseでGKを最初に置く
+  html += '<div class="line"><div class="dot gk"></div></div>';
+  lines.forEach(n=>{
+    html += '<div class="line">';
+    for(let i=0;i<n;i++) html += '<div class="dot"></div>';
+    html += '</div>';
+  });
+  return html + '</div>';
+}
+
+const formDesc = {
+  "4-3-3":"DF4・MF3・FW3。攻撃的でサイドからの突破が得意な人気の形。",
+  "4-2-3-1":"DF4・ボランチ2・MF3・FW1。守備と攻撃のバランスが良い現代の定番。",
+  "3-4-2-1":"DF3・MF4・シャドー2・FW1。両サイドを大きく使い、日本がよく採用する形。",
+  "4-4-2":"DF4・MF4・FW2。シンプルで守りやすい伝統的な形。"
+};
+
+const c = q("c");
+const t = window.TEAMS && window.TEAMS[c];
+const app = document.getElementById("app");
+
+if(!t){
+  app.innerHTML = '<div class="err">チームが見つかりませんでした。<br><br><a class="back" href="index.html">← トップにもどる</a></div>';
+  document.title = "チーム情報 ⚽";
+} else {
+  document.title = t.name + " | 我が家のW杯2026";
+  const starsHtml = t.stars.map(s=>'<span class="star">⭐ '+s+'</span>').join("");
+  const factsHtml = t.facts.map(f=>'<li>'+f+'</li>').join("");
+  const matchHtml = t.matches.map(m=>{
+    const rc = resClass(m.res);
+    const badge = m.res ? '<span class="mr '+rc+'">'+m.res+'</span>' : '<span class="mr none">これから</span>';
+    return '<div class="m"><div class="md">'+m.dj+'</div>'+
+      '<div class="mo">vs '+m.opp+' '+m.flag+ (m.note?'<span class="mn">'+(m.res?'✅ ':'')+m.note+'</span>':'') +'</div>'+
+      badge+'</div>';
+  }).join("");
+
+  app.innerHTML =
+    '<div class="hero" style="background:radial-gradient(circle at 50% 0%, '+hexA(t.color,0.55)+', transparent 70%);">'+
+      '<div class="flag">'+t.flag+'</div>'+
+      '<h1>'+t.name+'</h1>'+
+      '<div class="nick">'+t.nickname+'</div>'+
+      '<div class="who">'+t.who+'の優勝予想チーム</div>'+
+    '</div>'+
+
+    '<div class="stat-row">'+
+      '<div class="stat"><div class="v">'+t.rank+'位</div><div class="l">FIFAランク</div></div>'+
+      '<div class="stat"><div class="v">'+t.titles+'回</div><div class="l">W杯優勝</div></div>'+
+      '<div class="stat"><div class="v">'+t.group.replace("グループ","")+'</div><div class="l">グループ</div></div>'+
+    '</div>'+
+
+    '<h2>📝 チームの特徴</h2><div class="box">'+t.style+'</div>'+
+
+    '<h2>⭐ 注目の選手</h2><div class="stars">'+starsHtml+'</div>'+
+
+    '<h2>🎯 よく使うフォーメーション</h2>'+
+    '<div class="formation-wrap">'+
+      '<div class="form-name">'+t.formation+'</div>'+
+      '<div class="form-desc">'+(formDesc[t.formation]||"")+'</div>'+
+      renderFormation(t.formation)+
+      '<div class="form-desc" style="margin:10px 0 0;">🔵 キーパー（GK）／🟡 フィールドの選手</div>'+
+    '</div>'+
+
+    '<h2>📅 W杯の試合（日本時間）</h2><div class="match-list">'+matchHtml+'</div>'+
+
+    '<h2>📈 今後の展望</h2><div class="outlook">'+t.outlook+'</div>'+
+
+    '<h2>💡 豆知識</h2><ul class="facts">'+factsHtml+'</ul>';
+}
+
+function hexA(hex,a){
+  const h = hex.replace("#","");
+  const r=parseInt(h.substring(0,2),16), g=parseInt(h.substring(2,4),16), b=parseInt(h.substring(4,6),16);
+  return "rgba("+r+","+g+","+b+","+a+")";
+}
+</script>
+</body>
+</html>

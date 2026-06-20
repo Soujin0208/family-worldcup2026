@@ -79,6 +79,7 @@
     margin-bottom: 12px;
     box-shadow: 0 3px 10px rgba(0,0,0,0.3);
   }
+  .tap-hint { font-size: 12.5px; text-align: center; opacity: 0.9; margin-bottom: 10px; background: rgba(0,0,0,0.22); border-radius: 10px; padding: 8px 10px; }
   .predict-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .predict-card {
     background: var(--card);
@@ -86,7 +87,14 @@
     border-radius: 14px;
     padding: 12px;
     text-align: center;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    cursor: pointer;
+    transition: transform 0.08s;
   }
+  .predict-card:active { transform: scale(0.97); }
+  .predict-card .pc-hint { font-size: 11px; color: var(--gold); font-weight: 700; margin-top: 6px; }
   .predict-card .name { font-size: 15px; font-weight: 700; }
   .predict-card .flag { font-size: 34px; margin: 6px 0 2px; }
   .predict-card .team { font-size: 14px; font-weight: 800; }
@@ -203,6 +211,11 @@
   .quiz-score .big { font-size: 42px; color: var(--gold); display: block; }
 
   /* 豆知識・おみくじ */
+  .level-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
+  .level-tab { background: rgba(255,255,255,0.10); border: 1.5px solid var(--card-border); color: var(--white); border-radius: 10px; padding: 9px 2px; font-size: 12.5px; font-weight: 700; cursor: pointer; line-height: 1.3; transition: transform 0.08s; }
+  .level-tab .lt-sub { display: block; font-size: 9.5px; font-weight: 500; opacity: 0.8; margin-top: 2px; }
+  .level-tab:active { transform: scale(0.95); }
+  .level-tab.active { background: var(--gold); color: #3a2a00; border-color: var(--gold); }
   .tip-box {
     background: var(--card);
     border: 1px solid var(--card-border);
@@ -258,37 +271,44 @@
   <section>
     <h2><span class="emoji">🔮</span>優勝予想バトル</h2>
     <div class="rule-banner">🎁 優勝チームを当てた人が プレゼント総取り！ 🎁</div>
+    <div class="tap-hint">👆 国旗カードをタップすると、そのチームの詳細ページが見られるよ</div>
     <div class="predict-grid">
-      <div class="predict-card br">
+      <a class="predict-card br" href="team.html?c=brazil">
         <div class="name">👨 父</div>
         <div class="flag">🇧🇷</div>
         <div class="team">ブラジル</div>
-      </div>
-      <div class="predict-card es">
+        <div class="pc-hint">タップで詳細 →</div>
+      </a>
+      <a class="predict-card es" href="team.html?c=spain">
         <div class="name">👩 母</div>
         <div class="flag">🇪🇸</div>
         <div class="team">スペイン</div>
-      </div>
-      <div class="predict-card fr">
+        <div class="pc-hint">タップで詳細 →</div>
+      </a>
+      <a class="predict-card fr" href="team.html?c=france">
         <div class="name">🧑 A</div>
         <div class="flag">🇫🇷</div>
         <div class="team">フランス</div>
-      </div>
-      <div class="predict-card ar">
+        <div class="pc-hint">タップで詳細 →</div>
+      </a>
+      <a class="predict-card ar" href="team.html?c=argentina">
         <div class="name">🧒 KT</div>
         <div class="flag">🇦🇷</div>
         <div class="team">アルゼンチン</div>
-      </div>
-      <div class="predict-card pt">
+        <div class="pc-hint">タップで詳細 →</div>
+      </a>
+      <a class="predict-card pt" href="team.html?c=portugal">
         <div class="name">🧒 KS</div>
         <div class="flag">🇵🇹</div>
         <div class="team">ポルトガル</div>
-      </div>
-      <div class="predict-card jp">
+        <div class="pc-hint">タップで詳細 →</div>
+      </a>
+      <a class="predict-card jp" href="team.html?c=japan">
         <div class="name">🧒 T</div>
         <div class="flag">🇯🇵</div>
         <div class="team">日本</div>
-      </div>
+        <div class="pc-hint">タップで詳細 →</div>
+      </a>
     </div>
   </section>
 
@@ -558,10 +578,16 @@
 
   <!-- 豆知識 -->
   <section>
-    <h2><span class="emoji">💡</span>サッカーが上手くなる豆知識</h2>
+    <h2><span class="emoji">💡</span>サッカー豆知識（レベル別）</h2>
+    <div class="level-tabs" id="level-tabs">
+      <button class="level-tab active" data-level="kinder">🧸 ようちえん<span class="lt-sub">Tにおすすめ</span></button>
+      <button class="level-tab" data-level="beginner">🌱 初心者<span class="lt-sub">ルール</span></button>
+      <button class="level-tab" data-level="mid">⚽ 中級者<span class="lt-sub">戦術・コツ</span></button>
+      <button class="level-tab" data-level="pro">🔥 上級者<span class="lt-sub">深い戦術</span></button>
+    </div>
     <div class="tip-box">
-      <div><span class="tip-tag" id="tip-tag">きほん</span></div>
-      <div class="tip-text" id="tip-text">ボタンを押すと、プレーに役立つ豆知識がランダムで出るよ！</div>
+      <div><span class="tip-tag" id="tip-tag">ようちえん</span></div>
+      <div class="tip-text" id="tip-text">レベルをえらんで、ボタンを押してね。豆知識がランダムで出るよ！</div>
       <button class="big-btn" onclick="showTip()">⚽ 豆知識を引く</button>
     </div>
   </section>
@@ -722,33 +748,81 @@ document.getElementById("quiz-next").onclick = () => {
 renderQuiz();
 
 /* ===== 豆知識 ===== */
-const tips = [
-  { tag:"トラップ", t:"ボールが来る前に首を振って周りを見る（スキャン）。プロは1分間に何十回も首を振っているよ。" },
-  { tag:"トラップ", t:"ファーストタッチは「止める」より「次にプレーしたい方向へ置く」。それだけで相手を1人かわせる。" },
-  { tag:"パス", t:"インサイドパスは軸足のつま先を「パスを出したい方向」に向けるとまっすぐ転がる。" },
-  { tag:"パス", t:"パスは味方の「利き足側」に出すと、次のプレーが速くなる。" },
-  { tag:"シュート", t:"シュートは強さよりコース。GKの届かない「ゴールの四隅」を狙おう。" },
-  { tag:"シュート", t:"焦ってふかしがちな人は、ボールの真ん中より少し上を蹴る意識で低い弾道になる。" },
-  { tag:"ドリブル", t:"ドリブルは「ボールを触る回数」が多いほど奪われにくい。細かいタッチで運ぼう。" },
-  { tag:"ドリブル", t:"相手を抜く瞬間はスピードの変化が一番効く。ゆっくり→一気に加速！" },
-  { tag:"ディフェンス", t:"守るときは「相手とゴールを結ぶ線上」に立つのが基本。ボールだけ見て飛び込まない。" },
-  { tag:"ディフェンス", t:"相手と1対1のときは半身（はんみ）で構えると、どちらに行かれても付いていける。" },
-  { tag:"ポジショニング", t:"ボールを持っていない時間は約97%。「ボールがない時にどう動くか」が上手さの差になる。" },
-  { tag:"ポジショニング", t:"味方がボールを持ったら「パスコースを2つ作る」動きを意識しよう。" },
-  { tag:"体の使い方", t:"速く走るより「速く止まれる」選手が上手い。減速とターンの練習をしよう。" },
-  { tag:"体の使い方", t:"ジャンプのヘディングは「腕を使ってバランス」を取ると高く跳べて当たり負けしない。" },
-  { tag:"コンディション", t:"試合の2時間前までにおにぎりやバナナでエネルギー補給。直前に食べすぎない。" },
-  { tag:"コンディション", t:"のどが渇く前に水分補給。「渇いた」と感じた時にはもう遅い。" },
-  { tag:"メンタル", t:"ミスした後の10秒が大事。下を向かずにすぐ次のポジションへ走る選手が信頼される。" },
-  { tag:"メンタル", t:"声を出す選手はそれだけで上手く見えるし、実際にチームを助けている。「マーク！」「フリー！」を言ってみよう。" },
-];
-let lastTip = -1;
+const tipsByLevel = {
+  kinder: { tag: "ようちえん 🧸", items: [
+    "サッカーは手をつかったらダメ！ キーパーさんだけ手をつかえるよ ✋",
+    "ボールをゴールにいれたら 1てん！ おおくいれたチームのかち ⚽",
+    "ボールをけるときは、足の内がわ（うちがわ）でやさしくね 👟",
+    "あおい ふくを きているのが 日本のチーム「サムライブルー」だよ 🇯🇵",
+    "わるいことをすると、きいろ や あかの カードが出るよ 🟨🟥",
+    "ゴールが きまったら、みんなで ハイタッチして よろこぼう 🙌",
+    "ボールを いっぱい おいかけて、たくさん 走ると かっこいい 🏃",
+    "メッシせんしゅ や ロナウドせんしゅは、せかいで いちばん ゆうめいな 王さま 👑",
+    "しあいの まえに、せんしゅ みんなで くにの うたを うたうよ 🎵",
+    "ころんでも すぐ 立ちあがる。あきらめないのが いちばん つよい 💪",
+    "キーパーさんは みどりや きいろなど、みんなと ちがう いろの ふくを きてるよ 🧤",
+    "ボールが せんから 外に出たら、いちど とまって やりなおし だよ 👌"
+  ]},
+  beginner: { tag: "初心者 🌱（ルール）", items: [
+    "サッカーは1チーム11人。前後半45分ずつ、合計90分で戦う。",
+    "ポジションは大きく4種類。GK（守護神）→ DF（守り）→ MF（中盤）→ FW（点取り役）。",
+    "イエローカード2枚で退場（レッド）。退場すると1人少ないまま戦わないといけない。",
+    "オフサイドは『待ち伏せ禁止』ルール。パスが出た瞬間、相手の最終ラインより前で受けると反則。",
+    "ハットトリック＝1人が1試合で3得点すること。とても珍しい大記録。",
+    "PK（ペナルティキック）は反則でもらえる11mからの1対1。ほぼ得点のチャンス。",
+    "ボールが外に出たら、スローイン・コーナーキック・ゴールキックのどれかで再開する。",
+    "フォーメーションの数字は『DF-MF-FW』の人数。例：4-4-2なら守り4・中盤4・前2。",
+    "勝ったら勝点3、引き分け1、負け0。グループリーグはこの合計で順位を決める。",
+    "前半と後半でコート（陣地）を入れかわる。風や日差しの条件を公平にするため。",
+    "主審（しゅしん）が試合をコントロール。今大会はVAR（ビデオ判定）も使われる。",
+    "ロスタイム（アディショナルタイム）＝けがの治療などで止まった分を後で追加する時間。"
+  ]},
+  mid: { tag: "中級者 ⚽（戦術・コツ）", items: [
+    "4-3-3は攻撃的な人気の形。両ウイングがサイドを切り裂く。スペインやブラジルが採用。",
+    "4-2-3-1はバランス型で現代の定番。2枚のボランチが守備を安定させ、トップ下が攻撃の起点に。",
+    "3-4-2-1は両サイドを大きく使う形。日本がよく採用し、守備時は5バックに可変する。",
+    "『プレス』＝相手ボールに素早く寄せて自由を奪うこと。高い位置で奪えば一気にチャンス。",
+    "『ビルドアップ』＝後ろから丁寧にパスをつないで攻撃を組み立てること。",
+    "『カウンター（速攻）』＝奪った瞬間、手数をかけず一気に攻める。日本の得意技。",
+    "コツ：ボールを止める『トラップ』は、次にプレーしたい方向へ置くと相手を1人かわせる。",
+    "コツ：ボールが来る前に首を振って周りを見る『スキャン』。上手い選手ほど何度も見ている。",
+    "コツ：パスは味方の利き足側へ。それだけで次のプレーがぐっと速くなる。",
+    "セットプレー（CK・FK）は全得点の約3割を生む。練習した形が試合を決める。",
+    "コツ：守るときは『相手とゴールを結ぶ線上』に立つ。ボールだけ見て飛び込まない。",
+    "ボールを持っていない時間は試合の約99%。『持っていない時の動き』が上手さの差になる。"
+  ]},
+  pro: { tag: "上級者 🔥（深い戦術）", items: [
+    "ゲーゲンプレッシング＝ボールを失った直後に全員で囲んで即座に奪い返す考え方。",
+    "ハイライン＝DFラインを高く保ち相手を押し込む。裏のスペースとオフサイドの駆け引きが鍵。",
+    "偽9番（フォルスナイン）＝CFが中盤に降りて相手DFを引き出し、空いたスペースを味方が使う。",
+    "ハーフスペース＝サイドと中央の間のエリア。ここを取ると一気に決定機が生まれる。",
+    "ポジショナルプレー＝各所で数的・位置的な優位を作り、相手を動かして崩す設計思想。",
+    "インバーテッドSB＝サイドバックが内側へ絞り、中盤の人数を増やしてビルドアップを助ける。",
+    "トランジション（攻守の切り替え）の速さが、現代サッカーで勝敗を分ける最大の要素。",
+    "xG（期待得点）＝そのシュートが決まる確率を数値化した指標。内容を数字で評価できる。",
+    "コツ：認知→判断→実行のサイクルを速く。ボールを受ける前に次の絵を描いておく。",
+    "コツ：体の向き（ボディシェイプ）を半身に保つと、複数の選択肢を同時に持てる。",
+    "ローブロック＝自陣で守備ブロックを固め、相手を引き込んでカウンターを狙う戦術。",
+    "ライン間（DFとMFの間）でボールを受けられる選手は、相手の守備を最も困らせる。"
+  ]}
+};
+let curLevel = "kinder", lastTip = -1;
+document.querySelectorAll(".level-tab").forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll(".level-tab").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    curLevel = btn.dataset.level;
+    lastTip = -1;
+    showTip();
+  };
+});
 function showTip() {
+  const lv = tipsByLevel[curLevel];
   let i;
-  do { i = Math.floor(Math.random() * tips.length); } while (i === lastTip);
+  do { i = Math.floor(Math.random() * lv.items.length); } while (i === lastTip && lv.items.length > 1);
   lastTip = i;
-  document.getElementById("tip-tag").textContent = tips[i].tag;
-  document.getElementById("tip-text").textContent = tips[i].t;
+  document.getElementById("tip-tag").textContent = lv.tag;
+  document.getElementById("tip-text").textContent = lv.items[i];
 }
 
 /* ===== おみくじ ===== */
