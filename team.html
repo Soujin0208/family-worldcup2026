@@ -69,6 +69,7 @@
   .m .mr.win{background:#2e7d32;} .m .mr.draw{background:#b8902a;} .m .mr.loss{background:#b03030;}
   .m .mr.none{background:rgba(255,255,255,0.12);font-weight:700;font-size:11px;opacity:0.8;}
   .m .mn{font-size:11px;color:#ffd54f;display:block;margin-top:2px;}
+  .m .opp-intro{font-size:11px;opacity:0.8;display:block;margin-top:2px;line-height:1.4;}
 
   .outlook{background:rgba(0,0,0,0.3);border:1px solid var(--gold);border-radius:14px;
     padding:13px 15px;font-size:14px;line-height:1.7;}
@@ -139,8 +140,10 @@ if(!t){
     const rc = resClass(m.res);
     const badge = m.res ? '<span class="mr '+rc+'">'+m.res+'</span>' : '<span class="mr none">これから</span>';
     const oppMap = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(m.opp);
+    const oc = (window.OPPONENTS && window.OPPONENTS[m.opp]) || null;
+    const ocLine = oc ? '<span class="opp-intro">🌍 '+oc.c+'・'+oc.f+'</span>' : '';
     return '<div class="m"><div class="md">'+m.dj+'</div>'+
-      '<div class="mo">vs '+m.opp+' '+m.flag+' <a class="mini-map" href="'+oppMap+'" target="_blank" rel="noopener" title="地図で見る">🗺️</a>'+ (m.note?'<span class="mn">'+(m.res?'✅ ':'')+m.note+'</span>':'') +'</div>'+
+      '<div class="mo">vs '+m.opp+' '+m.flag+' <a class="mini-map" href="'+oppMap+'" target="_blank" rel="noopener" title="地図で見る">🗺️</a>'+ (m.note?'<span class="mn">'+(m.res?'✅ ':'')+m.note+'</span>':'') + ocLine +'</div>'+
       badge+'</div>';
   }).join("");
 
