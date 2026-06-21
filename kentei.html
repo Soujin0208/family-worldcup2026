@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>サッカー検定 ⚽ | 我が家のW杯2026</title>
+<style>
+  :root{
+    --pitch:#0a5c2e; --pitch-dark:#073d1f; --gold:#ffd700; --white:#fff;
+    --card:rgba(255,255,255,0.10); --card-border:rgba(255,255,255,0.22);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+    background:linear-gradient(160deg,var(--pitch-dark) 0%,var(--pitch) 45%,#0e7a3d 100%);
+    color:var(--white);min-height:100vh;padding-bottom:40px;}
+  .container{max-width:540px;margin:0 auto;padding:0 12px;}
+  .back{display:inline-flex;align-items:center;gap:6px;margin:14px 0 4px;background:rgba(0,0,0,0.3);
+    border:1px solid var(--card-border);color:var(--white);text-decoration:none;font-size:13px;font-weight:700;
+    padding:8px 14px;border-radius:999px;}
+  h1{text-align:center;font-size:22px;font-weight:800;margin:6px 0 2px;}
+  .sub{text-align:center;font-size:12px;opacity:0.85;margin-bottom:12px;}
+
+  /* ランク・XP */
+  .rankcard{background:linear-gradient(120deg,#1b3a1b,#0a5c2e);border:2px solid var(--gold);border-radius:16px;
+    padding:14px 16px;text-align:center;position:relative;overflow:hidden;}
+  .rankcard .title{font-size:12px;color:var(--gold);font-weight:800;letter-spacing:1px;}
+  .rankcard .grade{font-size:40px;font-weight:800;line-height:1.05;margin:2px 0;}
+  .rankcard .who{font-size:12px;opacity:0.9;}
+  .xpbar{height:14px;background:rgba(0,0,0,0.4);border-radius:999px;margin:10px 0 4px;overflow:hidden;border:1px solid var(--card-border);}
+  .xpfill{height:100%;background:linear-gradient(90deg,#ffe14d,#ffb300);width:0%;transition:width .5s ease;}
+  .xptext{font-size:11px;opacity:0.85;}
+
+  .pick{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:12px 0;}
+  .chip{background:rgba(255,255,255,0.10);border:1.5px solid var(--card-border);color:var(--white);
+    border-radius:999px;padding:7px 13px;font-size:13px;font-weight:700;cursor:pointer;}
+  .chip.active{background:var(--gold);color:#3a2a00;border-color:var(--gold);}
+
+  /* タブ */
+  .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:14px 0 12px;}
+  .tab{background:rgba(255,255,255,0.10);border:1.5px solid var(--card-border);color:var(--white);
+    border-radius:10px;padding:11px 4px;font-size:13.5px;font-weight:800;cursor:pointer;}
+  .tab.active{background:var(--gold);color:#3a2a00;border-color:var(--gold);}
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* クイズ */
+  .cat-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+  .cat{background:rgba(255,255,255,0.08);border:1px solid var(--card-border);color:var(--white);
+    border-radius:999px;padding:6px 11px;font-size:12px;font-weight:700;cursor:pointer;}
+  .cat.active{background:rgba(255,215,0,0.85);color:#3a2a00;border-color:var(--gold);}
+  .qbox{background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:16px;}
+  .qmeta{display:flex;justify-content:space-between;font-size:11px;opacity:0.85;margin-bottom:8px;}
+  .qmeta .lv{color:var(--gold);font-weight:800;}
+  .qtext{font-size:16px;font-weight:800;line-height:1.6;margin-bottom:14px;}
+  .opts{display:grid;gap:9px;}
+  .opt{background:rgba(255,255,255,0.10);border:1.5px solid var(--card-border);color:var(--white);
+    border-radius:12px;padding:12px 13px;font-size:14.5px;font-weight:600;text-align:left;cursor:pointer;
+    transition:transform .07s;line-height:1.5;}
+  .opt:active{transform:scale(0.98);}
+  .opt.correct{background:#2e7d32;border-color:#81c784;}
+  .opt.wrong{background:#b03030;border-color:#ef9a9a;}
+  .opt:disabled{cursor:default;}
+  .ex{margin-top:13px;background:rgba(0,0,0,0.32);border-radius:11px;padding:12px 13px;font-size:13.5px;
+    line-height:1.7;display:none;border-left:4px solid var(--gold);}
+  .ex .xp{color:var(--gold);font-weight:800;}
+  .next{display:none;width:100%;margin-top:13px;background:var(--gold);color:#3a2a00;font-size:16px;font-weight:800;
+    border:none;border-radius:12px;padding:14px;cursor:pointer;}
+  .next:active{transform:scale(0.98);}
+
+  /* トレーニング */
+  .tier-name{text-align:center;font-size:13px;color:var(--gold);font-weight:800;margin-bottom:4px;}
+  .tnote{font-size:12px;opacity:0.85;text-align:center;margin-bottom:12px;line-height:1.6;}
+  .drill{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--card-border);
+    border-radius:13px;padding:13px;margin-bottom:9px;cursor:pointer;transition:transform .07s;}
+  .drill:active{transform:scale(0.99);}
+  .drill .chk{width:28px;height:28px;border-radius:8px;border:2px solid var(--card-border);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:18px;}
+  .drill.done .chk{background:#2e7d32;border-color:#81c784;}
+  .drill.done{opacity:0.7;}
+  .drill .dt{font-size:14px;font-weight:700;line-height:1.45;}
+  .drill .dx{font-size:11px;color:var(--gold);font-weight:700;}
+  .streakcard{background:rgba(0,0,0,0.3);border:1px solid var(--gold);border-radius:13px;padding:12px;
+    text-align:center;margin-bottom:12px;}
+  .streakcard .big{font-size:30px;font-weight:800;color:var(--gold);}
+
+  /* 成績 */
+  .statline{margin-bottom:11px;}
+  .statline .lab{display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:4px;}
+  .statline .lab .pct{color:var(--gold);}
+  .accbar{height:11px;background:rgba(0,0,0,0.4);border-radius:999px;overflow:hidden;}
+  .accfill{height:100%;background:linear-gradient(90deg,#66bb6a,#43a047);}
+  .accfill.low{background:linear-gradient(90deg,#ef5350,#e53935);}
+  .accfill.mid{background:linear-gradient(90deg,#ffca28,#ffb300);}
+  .weak{background:rgba(0,0,0,0.3);border-radius:11px;padding:11px 13px;font-size:13px;line-height:1.6;margin:12px 0;}
+  .weak b{color:var(--gold);}
+  .badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+  .badge{background:rgba(255,255,255,0.08);border:1px solid var(--card-border);border-radius:11px;
+    padding:9px 10px;font-size:12px;font-weight:700;text-align:center;width:calc(33.3% - 6px);opacity:0.4;}
+  .badge.on{opacity:1;background:rgba(255,215,0,0.16);border-color:var(--gold);}
+  .badge .be{font-size:22px;display:block;}
+
+  .panel{background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:13px;margin-top:12px;}
+  .panel h3{font-size:13px;color:var(--gold);margin-bottom:9px;font-weight:800;}
+  footer{text-align:center;font-size:11px;opacity:0.6;margin-top:24px;line-height:1.7;}
+  .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:rgba(0,0,0,0.88);color:#fff;
+    padding:11px 18px;border-radius:999px;font-size:14px;font-weight:700;opacity:0;transition:opacity .25s;z-index:30;
+    pointer-events:none;text-align:center;max-width:90%;}
+  .toast.show{opacity:1;}
+  .levelup{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:40;}
+  .levelup.show{display:flex;animation:fade .3s;}
+  @keyframes fade{from{opacity:0;}to{opacity:1;}}
+  .lu-card{background:linear-gradient(135deg,#1b3a1b,#0a5c2e);border:3px solid var(--gold);border-radius:20px;
+    padding:28px 24px;text-align:center;max-width:300px;}
+  .lu-card .lu-emoji{font-size:54px;}
+  .lu-card .lu-t{font-size:15px;color:var(--gold);font-weight:800;margin-top:6px;}
+  .lu-card .lu-g{font-size:34px;font-weight:800;margin:4px 0;}
+  .lu-card button{margin-top:14px;background:var(--gold);color:#3a2a00;border:none;border-radius:12px;
+    padding:12px 26px;font-size:15px;font-weight:800;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="back" href="index.html">← トップにもどる</a>
+  <h1>⚽ サッカー検定 &amp; トレーニング</h1>
+  <div class="sub">知識で級を上げ、トレーニングで本物の力に。本気で上手くなりたい人へ。</div>
+
+  <div class="rankcard">
+    <div class="title">あなたの級位</div>
+    <div class="grade" id="r-grade">10級</div>
+    <div class="who" id="r-rank">🌱 ルーキー</div>
+    <div class="xpbar"><div class="xpfill" id="r-xpfill"></div></div>
+    <div class="xptext"><span id="r-xptext">0 / 80 XP</span>　｜　累計 <span id="r-totxp">0</span> XP</div>
+  </div>
+
+  <div class="pick" id="playerPick"></div>
+
+  <div class="tabs">
+    <button class="tab active" data-view="quiz">📝 検定クイズ</button>
+    <button class="tab" data-view="train">🏃 トレーニング</button>
+    <button class="tab" data-view="stat">📊 成績・弱点</button>
+  </div>
+
+  <!-- クイズ -->
+  <div class="view active" id="view-quiz">
+    <div class="cat-row" id="catRow"></div>
+    <div class="qbox">
+      <div class="qmeta"><span class="lv" id="q-lv"></span><span id="q-cat"></span></div>
+      <div class="qtext" id="q-text">読み込み中…</div>
+      <div class="opts" id="q-opts"></div>
+      <div class="ex" id="q-ex"></div>
+      <button class="next" id="q-next">次の問題 ▶</button>
+    </div>
+  </div>
+
+  <!-- トレーニング -->
+  <div class="view" id="view-train">
+    <div class="streakcard">
+      <div class="big" id="t-streak">0</div>
+      <div style="font-size:12px;opacity:0.9;">日連続トレーニング中 🔥</div>
+    </div>
+    <div class="tier-name" id="t-tier"></div>
+    <div class="tnote" id="t-note"></div>
+    <div id="drillList"></div>
+    <div class="panel" style="margin-top:4px;"><h3>💡 トレーニングの心得</h3>
+      <div style="font-size:13px;line-height:1.7;">毎日少しでも触ること。チェックは「やったらつける」。級が上がると、より実戦的なメニューに切り替わる。記録は続けるほど自信になる。</div>
+    </div>
+  </div>
+
+  <!-- 成績 -->
+  <div class="view" id="view-stat">
+    <div class="panel"><h3>📈 分野別の正答率</h3><div id="statBars"></div>
+      <div class="weak" id="weakBox"></div>
+    </div>
+    <div class="panel"><h3>🔢 累計</h3>
+      <div style="font-size:14px;line-height:1.9;">
+        解いた問題：<b id="s-ans">0</b> 問　／　正解：<b id="s-cor">0</b> 問<br>
+        正答率：<b id="s-rate">0%</b>　／　最高連続正解：<b id="s-streak">0</b>
+      </div>
+    </div>
+    <div class="panel"><h3>🏅 バッジ</h3><div class="badges" id="badgeBox"></div></div>
+  </div>
+
+  <footer>我が家のW杯2026 サッカー検定 ⚽<br>記録はこの端末の中だけに保存されます（プレイヤーごと）</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="levelup" id="levelup"><div class="lu-card">
+  <div class="lu-emoji" id="lu-emoji">🎉</div>
+  <div class="lu-t">昇級！</div>
+  <div class="lu-g" id="lu-grade"></div>
+  <div id="lu-rank" style="font-size:13px;opacity:0.9;"></div>
+  <button onclick="document.getElementById('levelup').classList.remove('show')">つづける</button>
+</div></div>
+
+<script src="kentei-data.js"></script>
+<script>
+const PLAYERS=["父","母","A","KT","KS","T"];
+const CATS=[
+  {k:"all",  n:"おまかせ", e:"🎲"},
+  {k:"rule", n:"ルール審判", e:"⚖️"},
+  {k:"tactic",n:"戦術", e:"🧠"},
+  {k:"tech", n:"技術理論", e:"🎯"},
+  {k:"phys", n:"体・栄養", e:"💪"},
+  {k:"dec",  n:"状況判断", e:"⚡"},
+  {k:"ment", n:"メンタル", e:"🔥"}
+];
+const GRADES=["10級","9級","8級","7級","6級","5級","4級","3級","2級","1級","初段","二段","三段","四段"];
+function rankTitle(l){ if(l>=10)return "👑 キャプテン"; if(l>=7)return "⭐ エース"; if(l>=4)return "⚽ レギュラー"; return "🌱 ルーキー"; }
+function xpToNext(l){ return 80 + l*30; }
+function tierOf(l){ if(l>=10)return "captain"; if(l>=7)return "ace"; if(l>=4)return "regular"; return "rookie"; }
+
+let player = localStorage.getItem("wc_k_player") || "KT";
+let curCat = "all";
+let answered = false;
+let curQ = null, lastQid = -1;
+
+const $=id=>document.getElementById(id);
+function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
+function key(){ return "wc_kentei_"+player; }
+function load(){
+  let d; try{ d=JSON.parse(localStorage.getItem(key())); }catch(e){}
+  if(!d) d={level:0,xp:0,totxp:0,ans:0,cor:0,maxStreak:0,curStreak:0,cat:{},drills:{},dates:[],sdays:0,last:""};
+  d.cat=d.cat||{}; d.drills=d.drills||{}; d.dates=d.dates||[];
+  return d;
+}
+function save(d){ localStorage.setItem(key(),JSON.stringify(d)); }
+
+/* 出席（連続日数） */
+function touchDay(d){
+  const t=todayStr();
+  if(d.last===t) return;
+  const y=new Date(); y.setDate(y.getDate()-1);
+  const ys=y.getFullYear()+"-"+(y.getMonth()+1)+"-"+y.getDate();
+  d.sdays = (d.last===ys) ? (d.sdays+1) : 1;
+  d.last=t;
+}
+
+/* XP付与＋昇級 */
+function addXP(d,amount){
+  d.xp+=amount; d.totxp+=amount; let up=false;
+  while(d.level<GRADES.length-1 && d.xp>=xpToNext(d.level)){ d.xp-=xpToNext(d.level); d.level++; up=true; }
+  return up;
+}
+
+/* ===== 初期化 ===== */
+function init(){
+  const pp=$("playerPick");
+  PLAYERS.forEach(p=>{ const c=document.createElement("button");
+    c.className="chip"+(p===player?" active":""); c.textContent=p;
+    c.onclick=()=>{ player=p; localStorage.setItem("wc_k_player",p);
+      document.querySelectorAll("#playerPick .chip").forEach(x=>x.classList.toggle("active",x.textContent===p));
+      renderAll(); newQuestion(); };
+    pp.appendChild(c); });
+  const cr=$("catRow");
+  CATS.forEach(c=>{ const b=document.createElement("button");
+    b.className="cat"+(c.k===curCat?" active":""); b.innerHTML=c.e+" "+c.n;
+    b.onclick=()=>{ curCat=c.k; document.querySelectorAll(".cat").forEach(x=>x.classList.remove("active"));
+      b.classList.add("active"); newQuestion(); };
+    cr.appendChild(b); });
+  document.querySelectorAll(".tab").forEach(t=>{ t.onclick=()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
+    t.classList.add("active"); $("view-"+t.dataset.view).classList.add("active");
+    if(t.dataset.view==="train") renderTrain();
+    if(t.dataset.view==="stat") renderStat();
+  };});
+  $("q-next").onclick=newQuestion;
+  renderAll(); newQuestion();
+}
+
+function renderAll(){ renderRank(); }
+function renderRank(){
+  const d=load();
+  $("r-grade").textContent=GRADES[d.level];
+  $("r-rank").textContent=rankTitle(d.level)+"（"+player+"）";
+  const need=xpToNext(d.level);
+  $("r-xpfill").style.width=Math.min(100,Math.round(d.xp/need*100))+"%";
+  $("r-xptext").textContent=d.xp+" / "+need+" XP";
+  $("r-totxp").textContent=d.totxp;
+}
+
+/* ===== クイズ ===== */
+function newQuestion(){
+  answered=false;
+  const d=load();
+  let pool=window.KENTEI.filter((q,i)=>(q.lv<=d.level)&&(curCat==="all"||q.cat===curCat));
+  if(pool.length===0) pool=window.KENTEI.filter(q=>(curCat==="all"||q.cat===curCat)); // 念のため
+  if(pool.length===0) pool=window.KENTEI.slice();
+  let pick;
+  do { pick=pool[Math.floor(Math.random()*pool.length)]; } while(pool.length>1 && window.KENTEI.indexOf(pick)===lastQid);
+  lastQid=window.KENTEI.indexOf(pick); curQ=pick;
+  const cat=CATS.find(c=>c.k===pick.cat);
+  $("q-lv").textContent="レベル "+(pick.lv+1);
+  $("q-cat").textContent=(cat?cat.e+" "+cat.n:"");
+  $("q-text").textContent=pick.q;
+  const ow=$("q-opts"); ow.innerHTML="";
+  pick.o.forEach((t,i)=>{ const b=document.createElement("button");
+    b.className="opt"; b.textContent=["Ａ","Ｂ","Ｃ","Ｄ"][i]+"　"+t;
+    b.onclick=()=>answer(i,b); ow.appendChild(b); });
+  $("q-ex").style.display="none"; $("q-next").style.display="none";
+}
+function answer(i,btn){
+  if(answered) return; answered=true;
+  const d=load(); const correct=(i===curQ.a);
+  const btns=document.querySelectorAll(".opt");
+  btns.forEach(b=>b.disabled=true);
+  btns[curQ.a].classList.add("correct");
+  if(!correct) btn.classList.add("wrong");
+  // 統計
+  d.ans++; d.cat[curQ.cat]=d.cat[curQ.cat]||{a:0,c:0}; d.cat[curQ.cat].a++;
+  let gained=0, up=false;
+  if(correct){
+    d.cor++; d.cat[curQ.cat].c++; d.curStreak++; if(d.curStreak>d.maxStreak)d.maxStreak=d.curStreak;
+    const base=12+curQ.lv*2; const bonus=Math.min(8,d.curStreak); gained=base+bonus;
+    touchDay(d); up=addXP(d,gained);
+  } else { d.curStreak=0; }
+  save(d); renderRank();
+  const ex=$("q-ex");
+  ex.innerHTML=(correct?'⭕ <span class="xp">正解！ +'+gained+'XP</span>':'❌ <b>不正解</b>')+'<br>'+curQ.ex
+    +(correct&&d.curStreak>=2?'<br>🔥 '+d.curStreak+'問連続正解中（連続ボーナス）':'');
+  ex.style.display="block"; $("q-next").style.display="block";
+  if(up) showLevelUp(d);
+}
+function showLevelUp(d){
+  $("lu-grade").textContent=GRADES[d.level]+" に昇級！";
+  $("lu-rank").textContent=rankTitle(d.level)+"　— 新しいレベルの問題が解禁されたよ";
+  $("lu-emoji").textContent=d.level>=10?"👑":(d.level>=7?"⭐":"🎉");
+  $("levelup").classList.add("show");
+}
+
+/* ===== トレーニング ===== */
+function renderTrain(){
+  const d=load(); const tier=tierOf(d.level); const set=window.DRILLS[tier];
+  $("t-streak").textContent=d.sdays;
+  $("t-tier").textContent=set.name;
+  $("t-note").textContent=set.note;
+  const t=todayStr(); const wl=$("drillList"); wl.innerHTML="";
+  set.items.forEach(dr=>{ const doneToday=d.drills[dr.k]===t;
+    const el=document.createElement("div"); el.className="drill"+(doneToday?" done":"");
+    el.innerHTML='<div class="chk">'+(doneToday?"✓":"")+'</div><div><div class="dt">'+dr.t+'</div><div class="dx">+'+dr.xp+'XP'+(doneToday?'（今日達成）':'')+'</div></div>';
+    el.onclick=()=>{ if(d.drills[dr.k]===t) return;
+      const dd=load(); dd.drills[dr.k]=t; touchDay(dd); const up=addXP(dd,dr.xp); save(dd);
+      renderRank(); renderTrain(); toast("トレ達成！ +"+dr.xp+"XP 💪"); if(up)showLevelUp(dd); };
+    wl.appendChild(el); });
+}
+
+/* ===== 成績 ===== */
+function renderStat(){
+  const d=load(); const sb=$("statBars"); sb.innerHTML="";
+  let worst=null;
+  CATS.filter(c=>c.k!=="all").forEach(c=>{
+    const s=d.cat[c.k]||{a:0,c:0}; const pct=s.a?Math.round(s.c/s.a*100):0;
+    if(s.a>=3 && (worst===null||pct<worst.pct)) worst={c,pct};
+    const cls=s.a===0?"":(pct>=80?"":pct>=50?"mid":"low");
+    sb.innerHTML+='<div class="statline"><div class="lab"><span>'+c.e+' '+c.n+'</span><span class="pct">'+(s.a?pct+"%":"—")+' <span style="opacity:.7;font-weight:400">('+s.c+'/'+s.a+')</span></span></div>'
+      +'<div class="accbar"><div class="accfill '+cls+'" style="width:'+pct+'%"></div></div></div>';
+  });
+  $("weakBox").innerHTML = worst ? ('🎯 いま伸ばすと効くのは <b>'+worst.c.e+' '+worst.c.n+'</b>（正答率'+worst.pct+'%）。この分野を集中的に解いてみよう。')
+    : 'もっと問題を解くと、弱点分野が分かるようになるよ。';
+  $("s-ans").textContent=d.ans; $("s-cor").textContent=d.cor;
+  $("s-rate").textContent=(d.ans?Math.round(d.cor/d.ans*100):0)+"%"; $("s-streak").textContent=d.maxStreak;
+  // バッジ
+  const badges=[
+    {e:"🎫",l:"初正解",on:d.cor>=1},
+    {e:"📚",l:"50問正解",on:d.cor>=50},
+    {e:"🎓",l:"100問正解",on:d.cor>=100},
+    {e:"🔥",l:"10連続正解",on:d.maxStreak>=10},
+    {e:"🥋",l:"初段到達",on:d.level>=10},
+    {e:"🏅",l:"1級到達",on:d.level>=9},
+    {e:"💪",l:"トレ7日連続",on:d.sdays>=7},
+    {e:"🧠",l:"戦術マスター",on:(d.cat.tactic&&d.cat.tactic.a>=10&&d.cat.tactic.c/d.cat.tactic.a>=0.8)},
+    {e:"⚖️",l:"ルール博士",on:(d.cat.rule&&d.cat.rule.a>=10&&d.cat.rule.c/d.cat.rule.a>=0.8)}
+  ];
+  $("badgeBox").innerHTML=badges.map(b=>'<div class="badge'+(b.on?" on":"")+'"><span class="be">'+b.e+'</span>'+b.l+'</div>').join("");
+}
+
+let toastT=null;
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show");
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),1900); }
+
+init();
+</script>
+</body>
+</html>
