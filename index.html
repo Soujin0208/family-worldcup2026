@@ -56,6 +56,18 @@
   .countdown.live { animation: pulse 1.2s infinite; border-color: #ff5252; }
   @keyframes pulse { 0%,100%{box-shadow:0 0 0 rgba(255,82,82,0);} 50%{box-shadow:0 0 18px rgba(255,82,82,0.7);} }
 
+  /* ゲームCTA */
+  .game-cta{display:flex;align-items:center;gap:12px;text-decoration:none;color:#3a2a00;
+    background:linear-gradient(100deg,#ffe14d,#ffd700,#ffb300);border-radius:16px;padding:14px 16px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.3);transition:transform .08s;border:2px solid #fff3b0;}
+  .game-cta:active{transform:scale(0.98);}
+  .game-cta .gc-emoji{font-size:34px;line-height:1;}
+  .game-cta .gc-main{flex:1;}
+  .game-cta .gc-title{font-size:18px;font-weight:800;}
+  .game-cta .gc-sub{font-size:11.5px;font-weight:600;opacity:0.85;margin-top:2px;line-height:1.4;}
+  .game-cta .gc-best{font-size:12px;font-weight:800;margin-top:5px;color:#7a4a00;}
+  .game-cta .gc-arrow{font-size:18px;font-weight:800;}
+
   /* セクション */
   section { margin-top: 26px; }
   h2 {
@@ -266,6 +278,19 @@
     <div class="timer" id="cd-timer">--:--:--</div>
     <div class="when" id="cd-when"></div>
   </div>
+
+  <!-- ゲーム -->
+  <section>
+    <a class="game-cta" href="game.html">
+      <div class="gc-emoji">🥅⚽</div>
+      <div class="gc-main">
+        <div class="gc-title">⚽ PKチャレンジで遊ぶ</div>
+        <div class="gc-sub">ねらってシュート！ こども（タップだけ）〜大人（連続記録）まで本気で楽しめる</div>
+        <div class="gc-best" id="gc-best"></div>
+      </div>
+      <div class="gc-arrow">▶</div>
+    </a>
+  </section>
 
   <!-- 優勝予想 -->
   <section>
@@ -850,6 +875,19 @@ function drawOmikuji() {
      <div>🎒 ラッキーアイテム：<b>${it}</b></div>
      <div style="font-size:13px; opacity:0.9; margin-top:4px;">${ad}</div>`;
 }
+
+/* ===== PKチャレンジ 家族ベスト表示 ===== */
+(function(){
+  try{
+    const top = JSON.parse(localStorage.getItem("wc_pk_top")||"null");
+    const el = document.getElementById("gc-best");
+    if(el && top && top.score>0){
+      el.textContent = "🏆 家族ベスト： "+top.p+" さん "+top.score+"点";
+    } else if(el){
+      el.textContent = "🏆 まだ記録なし — 1番のりで遊んでみよう！";
+    }
+  }catch(e){}
+})();
 </script>
 </body>
 </html>

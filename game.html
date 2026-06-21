@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PKチャレンジ ⚽ | 我が家のW杯2026</title>
+<style>
+  :root{
+    --pitch:#0a5c2e; --pitch-dark:#073d1f; --gold:#ffd700; --white:#fff;
+    --card:rgba(255,255,255,0.10); --card-border:rgba(255,255,255,0.22);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;}
+  body{
+    font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+    background:linear-gradient(160deg,var(--pitch-dark) 0%,var(--pitch) 45%,#0e7a3d 100%);
+    color:var(--white);min-height:100vh;padding-bottom:34px;
+  }
+  .container{max-width:520px;margin:0 auto;padding:0 12px;}
+  .back{display:inline-flex;align-items:center;gap:6px;margin:14px 0 4px;
+    background:rgba(0,0,0,0.3);border:1px solid var(--card-border);color:var(--white);
+    text-decoration:none;font-size:13px;font-weight:700;padding:8px 14px;border-radius:999px;}
+  h1{text-align:center;font-size:23px;font-weight:800;margin:6px 0 2px;}
+  .sub{text-align:center;font-size:12px;opacity:0.85;margin-bottom:10px;}
+
+  /* HUD */
+  .hud{display:flex;gap:8px;margin-bottom:8px;}
+  .hud .cell{flex:1;background:var(--card);border:1px solid var(--card-border);border-radius:12px;
+    padding:8px 4px;text-align:center;}
+  .hud .v{font-size:22px;font-weight:800;color:var(--gold);line-height:1;}
+  .hud .l{font-size:10.5px;opacity:0.85;margin-top:3px;}
+
+  /* スタジアム */
+  .stadium{position:relative;background:linear-gradient(0deg,#0b6e36 0%,#0d7a3c 60%,#7ec8ff 60%,#bfe6ff 100%);
+    border-radius:16px;overflow:hidden;border:2px solid rgba(255,255,255,0.25);}
+  .goal{position:relative;margin:18px auto 0;width:90%;height:0;padding-bottom:46%;}
+  .frame{position:absolute;inset:0;border:7px solid #fff;border-bottom:none;border-radius:6px 6px 0 0;
+    box-shadow:0 0 0 2px rgba(0,0,0,0.15);
+    background:
+      repeating-linear-gradient(90deg,rgba(255,255,255,0.10) 0 1px,transparent 1px 13px),
+      repeating-linear-gradient(0deg,rgba(255,255,255,0.10) 0 1px,transparent 1px 13px);}
+  .gk{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);
+    width:24%;height:42%;border-radius:12px 12px 8px 8px;
+    background:linear-gradient(180deg,#ff7043,#e64a19);border:2px solid #fff;
+    display:flex;align-items:center;justify-content:center;font-size:min(7vw,30px);
+    transition:left .38s cubic-bezier(.4,1.4,.5,1),top .38s ease;z-index:3;box-shadow:0 3px 8px rgba(0,0,0,0.3);}
+  .zones{position:absolute;inset:0;z-index:4;}
+  .zone{position:absolute;width:33.3%;height:50%;background:transparent;border:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;}
+  .zone .ring{width:34px;height:34px;border-radius:50%;border:2.5px dashed rgba(255,255,255,0.55);
+    transition:all .12s;display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .zone:active .ring,.zone.sel .ring{background:var(--gold);border-style:solid;border-color:#fff;transform:scale(1.18);}
+  .ball{position:absolute;left:50%;top:96%;transform:translate(-50%,-50%) scale(1);
+    font-size:min(9vw,38px);z-index:5;transition:left .5s ease,top .5s ease,transform .5s ease;
+    filter:drop-shadow(0 3px 3px rgba(0,0,0,0.35));pointer-events:none;}
+  .flash{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;
+    font-size:46px;font-weight:800;opacity:0;pointer-events:none;text-shadow:0 2px 10px rgba(0,0,0,0.5);}
+  .flash.show{animation:pop 1s ease;}
+  @keyframes pop{0%{opacity:0;transform:scale(0.4);}30%{opacity:1;transform:scale(1.15);}70%{opacity:1;transform:scale(1);}100%{opacity:0;transform:scale(1);}}
+
+  /* パワーメーター */
+  .meter{height:30px;margin:12px 0 4px;border-radius:999px;position:relative;overflow:hidden;
+    background:linear-gradient(90deg,#e53935 0 18%,#fbc02d 18% 38%,#43a047 38% 62%,#fbc02d 62% 82%,#e53935 82% 100%);
+    border:2px solid rgba(255,255,255,0.4);opacity:0.35;transition:opacity .2s;}
+  .meter.on{opacity:1;}
+  .meter .marker{position:absolute;top:-3px;bottom:-3px;width:5px;background:#fff;left:0%;
+    box-shadow:0 0 6px #fff;border-radius:3px;}
+  .meter-label{text-align:center;font-size:11px;opacity:0.8;height:14px;}
+
+  /* アクションボタン */
+  .action{display:block;width:100%;margin-top:10px;border:none;border-radius:14px;
+    font-size:20px;font-weight:800;padding:16px;cursor:pointer;transition:transform .08s,opacity .2s;
+    background:var(--gold);color:#3a2a00;}
+  .action:active{transform:scale(0.97);}
+  .action:disabled{opacity:0.4;}
+  .action.shoot{background:linear-gradient(90deg,#ff5252,#ff1744);color:#fff;}
+
+  /* 設定 */
+  .panel{background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:12px;margin-top:12px;}
+  .panel h3{font-size:13px;color:var(--gold);margin-bottom:8px;font-weight:800;}
+  .mode-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .seg{background:rgba(255,255,255,0.10);border:1.5px solid var(--card-border);color:var(--white);
+    border-radius:10px;padding:11px 4px;font-size:14px;font-weight:800;cursor:pointer;line-height:1.3;}
+  .seg .ss{display:block;font-size:10px;font-weight:500;opacity:0.8;margin-top:2px;}
+  .seg.active{background:var(--gold);color:#3a2a00;border-color:var(--gold);}
+  .pick{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{background:rgba(255,255,255,0.10);border:1.5px solid var(--card-border);color:var(--white);
+    border-radius:999px;padding:8px 12px;font-size:13px;font-weight:700;cursor:pointer;}
+  .chip.active{background:var(--gold);color:#3a2a00;border-color:var(--gold);}
+  .chip .cf{font-size:16px;margin-right:3px;}
+
+  /* ランキング */
+  table.lb{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:6px;}
+  table.lb th,table.lb td{border:1px solid rgba(255,255,255,0.15);padding:7px 5px;text-align:center;}
+  table.lb th{background:rgba(0,0,0,0.35);color:var(--gold);font-size:12px;}
+  table.lb td.me{font-weight:800;}
+  .crown{color:var(--gold);}
+
+  footer{text-align:center;font-size:11px;opacity:0.6;margin-top:22px;line-height:1.7;}
+  .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:rgba(0,0,0,0.85);
+    color:#fff;padding:10px 18px;border-radius:999px;font-size:14px;font-weight:700;opacity:0;
+    transition:opacity .25s;z-index:20;pointer-events:none;}
+  .toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="back" href="index.html">← トップにもどる</a>
+  <h1>⚽ PKチャレンジ</h1>
+  <div class="sub" id="sub">ねらってシュート！ ゴールをきめよう</div>
+
+  <div class="hud">
+    <div class="cell"><div class="v" id="h-streak">0</div><div class="l">れんぞくゴール</div></div>
+    <div class="cell"><div class="v" id="h-score">0</div><div class="l">スコア</div></div>
+    <div class="cell"><div class="v" id="h-best">0</div><div class="l">じぶんのベスト</div></div>
+  </div>
+
+  <div class="stadium">
+    <div class="goal">
+      <div class="frame"></div>
+      <div class="gk" id="gk">🧤</div>
+      <div class="zones" id="zones"></div>
+      <div class="ball" id="ball">⚽</div>
+      <div class="flash" id="flash"></div>
+    </div>
+  </div>
+
+  <div class="meter-label" id="meterLabel">チャレンジモードでは、バーがまん中（みどり）で「シュート！」</div>
+  <div class="meter" id="meter"><div class="marker" id="marker"></div></div>
+
+  <button class="action" id="actBtn">ねらう場所をタップ →</button>
+
+  <div class="panel">
+    <h3>🎮 モード</h3>
+    <div class="mode-row">
+      <button class="seg active" id="mode-kids" data-mode="kids">🧸 こども<span class="ss">タップだけ・終わらない</span></button>
+      <button class="seg" id="mode-pro" data-mode="pro">🔥 チャレンジ<span class="ss">パワーバー・1ミスで終了</span></button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>🧑 だれが プレイする？（記録がのこるよ）</h3>
+    <div class="pick" id="playerPick"></div>
+  </div>
+
+  <div class="panel">
+    <h3>🏳️ じぶんのチーム（キーパーは相手チームの色）</h3>
+    <div class="pick" id="teamPick"></div>
+  </div>
+
+  <div class="panel">
+    <h3>🏆 家族ランキング（この端末）</h3>
+    <table class="lb" id="lb"></table>
+    <div style="font-size:11px;opacity:0.7;margin-top:6px;">チャレンジモードの記録だけ保存されます。</div>
+  </div>
+
+  <footer>我が家のW杯2026 PKチャレンジ ⚽<br>記録はこのスマホ／パソコンの中だけに保存されます</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="teams-data.js"></script>
+<script>
+/* ===== 状態 ===== */
+const PLAYERS = ["父","母","A","KT","KS","T"];
+const ZONE_X = [16.7, 50, 83.3];        // 列の中心%（左/中/右）
+const ZONE_Y = [27, 73];                // 行の中心%（上/下）
+const CORNERS = [0,2];                   // 上の両すみ＝完璧なら止められない
+let mode = "kids";
+let player = localStorage.getItem("wc_pk_player") || "T";
+let teamKey = localStorage.getItem("wc_pk_team") || "japan";
+let streak = 0, score = 0;
+let state = "aim";          // aim → power → resolving
+let selZone = -1;
+let history = [];           // 直近のねらった場所（GKがクセを読む）
+let busy = false;
+let meterRAF = null, markerPos = 0, markerDir = 1;
+
+/* ===== 初期化 ===== */
+const $ = id => document.getElementById(id);
+function init(){
+  // ゾーンボタン
+  const zw = $("zones");
+  for(let i=0;i<6;i++){
+    const col=i%3, row=Math.floor(i/3);
+    const b=document.createElement("button");
+    b.className="zone"; b.dataset.zone=i;
+    b.style.left=(col*33.3)+"%"; b.style.top=(row*50)+"%";
+    b.innerHTML='<span class="ring">◎</span>';
+    b.onclick=()=>onZone(i);
+    zw.appendChild(b);
+  }
+  // プレイヤー
+  const pp=$("playerPick");
+  PLAYERS.forEach(p=>{
+    const c=document.createElement("button");
+    c.className="chip"+(p===player?" active":""); c.textContent=p;
+    c.onclick=()=>{player=p;localStorage.setItem("wc_pk_player",p);refreshChips();renderBest();renderLB();};
+    pp.appendChild(c);
+  });
+  // チーム
+  const tp=$("teamPick");
+  Object.keys(window.TEAMS||{}).forEach(k=>{
+    const t=window.TEAMS[k];
+    const c=document.createElement("button");
+    c.className="chip"+(k===teamKey?" active":""); c.dataset.team=k;
+    c.innerHTML='<span class="cf">'+t.flag+'</span>'+t.name;
+    c.onclick=()=>{teamKey=k;localStorage.setItem("wc_pk_team",k);refreshChips();applyTeam();};
+    tp.appendChild(c);
+  });
+  // モード
+  $("mode-kids").onclick=()=>setMode("kids");
+  $("mode-pro").onclick=()=>setMode("pro");
+  $("actBtn").onclick=onAction;
+  applyTeam(); renderBest(); renderLB(); resetKick(true);
+}
+function refreshChips(){
+  document.querySelectorAll("#playerPick .chip").forEach(c=>c.classList.toggle("active",c.textContent===player));
+  document.querySelectorAll("#teamPick .chip").forEach(c=>c.classList.toggle("active",c.dataset.team===teamKey));
+}
+function applyTeam(){
+  const t=window.TEAMS&&window.TEAMS[teamKey];
+  if(t){ $("ball").textContent="⚽"; }
+}
+
+/* ===== モード ===== */
+function setMode(m){
+  mode=m; busy=false; stopMeter();
+  $("mode-kids").classList.toggle("active",m==="kids");
+  $("mode-pro").classList.toggle("active",m==="pro");
+  streak=0; score=0; history=[];
+  $("sub").textContent = m==="kids" ? "すきな場所をタップ！ ゴールをいっぱいきめよう 🎉"
+                                    : "ねらう→パワーバーをみどりで「シュート！」 1ミスで終了 🔥";
+  $("meterLabel").style.visibility = m==="pro" ? "visible":"hidden";
+  updateHUD(); resetKick(true);
+}
+
+/* ===== キック1本の流れ ===== */
+function resetKick(full){
+  state="aim"; selZone=-1;
+  document.querySelectorAll(".zone").forEach(z=>z.classList.remove("sel"));
+  $("gk").style.left="50%"; $("gk").style.top="58%";
+  const ball=$("ball");
+  ball.style.transition="none"; ball.style.left="50%"; ball.style.top="96%";
+  ball.style.transform="translate(-50%,-50%) scale(1)";
+  void ball.offsetWidth; ball.style.transition="";
+  stopMeter(); $("meter").classList.remove("on");
+  $("actBtn").className="action"; $("actBtn").disabled=false;
+  $("actBtn").textContent = mode==="kids" ? "ねらう場所をタップ →" : "①ねらう場所をタップ →";
+}
+
+function onZone(i){
+  if(busy||state==="resolving") return;
+  selZone=i;
+  document.querySelectorAll(".zone").forEach(z=>z.classList.toggle("sel",+z.dataset.zone===i));
+  if(mode==="kids"){ shoot("perfect"); }
+  else { state="power"; startMeter(); $("actBtn").className="action shoot"; $("actBtn").textContent="② シュート！"; }
+}
+function onAction(){
+  if(busy) return;
+  if(mode==="pro"&&state==="power"){
+    const acc=lockMeter(); shoot(acc);
+  } else {
+    toast("ゴールの中をタップしてねらってね 👆");
+  }
+}
+
+/* ===== パワーメーター ===== */
+function startMeter(){
+  $("meter").classList.add("on"); markerPos=0; markerDir=1;
+  const speed = 1.7 + Math.min(1.6, streak*0.12);   // 連続で速く＝難しく
+  const step=()=>{
+    markerPos+=markerDir*speed;
+    if(markerPos>=100){markerPos=100;markerDir=-1;}
+    if(markerPos<=0){markerPos=0;markerDir=1;}
+    $("marker").style.left=markerPos+"%";
+    meterRAF=requestAnimationFrame(step);
+  };
+  step();
+}
+function stopMeter(){ if(meterRAF){cancelAnimationFrame(meterRAF);meterRAF=null;} }
+function lockMeter(){
+  stopMeter();
+  const greenHalf = Math.max(6, 12 - streak*0.5);    // みどり帯は連続で狭くなる
+  const d=Math.abs(markerPos-50);
+  if(d<=greenHalf) return "perfect";
+  if(d<=greenHalf+12) return "ok";
+  return "off";
+}
+
+/* ===== シュート判定 ===== */
+function keeperCovers(){
+  const t = mode==="kids"
+    ? {read:0.22, reach:0.0, fumble:0.38}
+    : {read:0.35+Math.min(0.40,streak*0.03), reach:Math.min(0.5,streak*0.04), fumble:0.0};
+  let main;
+  // クセ読み：直近で多くねらった場所を当てにくる
+  if(history.length>=2 && Math.random()<t.read){
+    const cnt={}; history.slice(-6).forEach(z=>cnt[z]=(cnt[z]||0)+1);
+    main=+Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0];
+  } else { main=Math.floor(Math.random()*6); }
+  const cover=new Set([main]);
+  if(Math.random()<t.reach){ const adj=main%3===0?main+1:(main%3===2?main-1:main+(Math.random()<.5?1:-1)); cover.add(adj); }
+  return {cover, fumble:t.fumble};
+}
+function shoot(acc){
+  if(busy) return; busy=true; state="resolving";
+  $("actBtn").disabled=true;
+  history.push(selZone);
+  const k=keeperCovers();
+  // ボールの行き先（offはわざと枠の外へ）
+  const col=selZone%3, row=Math.floor(selZone/3);
+  let bx=ZONE_X[col], by=ZONE_Y[row];
+  if(acc==="off"){ bx += (col===0?-22:col===2?22:(Math.random()<.5?-22:22)); by-=18; }
+  // GKの飛ぶ先
+  const gkZone=[...k.cover][0];
+  $("gk").style.left=ZONE_X[gkZone%3]+"%"; $("gk").style.top=(ZONE_Y[Math.floor(gkZone/3)]+12)+"%";
+  // ボール発射
+  const ball=$("ball");
+  requestAnimationFrame(()=>{ ball.style.left=bx+"%"; ball.style.top=by+"%"; ball.style.transform="translate(-50%,-50%) scale(0.55)"; });
+  // 判定
+  let goal=false, reason="";
+  if(acc==="off"){ goal=false; reason="ワク外！"; }
+  else{
+    let saved = k.cover.has(selZone);
+    if(saved && k.fumble && Math.random()<k.fumble) saved=false;        // こども：はじく
+    if(acc==="perfect" && CORNERS.includes(selZone)) saved=false;        // 完璧×上スミ＝無敵
+    goal=!saved; reason = goal ? (acc==="perfect"?"スーパーゴール！":"ゴール！") : "ナイスセーブ…";
+  }
+  setTimeout(()=>finish(goal,acc,reason),520);
+}
+
+function finish(goal,acc,reason){
+  const flash=$("flash"); flash.textContent = goal?"⚽ "+reason:"🧤 "+reason;
+  flash.style.color = goal?"#ffd54f":"#ff8a80";
+  flash.classList.remove("show"); void flash.offsetWidth; flash.classList.add("show");
+  if(goal){
+    streak++;
+    let pts = mode==="kids"?10 : 100+streak*20+(acc==="perfect"&&CORNERS.includes(selZone)?50:0);
+    score+=pts;
+    if(goal&&mode==="kids") confetti();
+    if(streak%5===0 && streak>0) toast("🔥 "+streak+"れんぞくゴール！すごい！");
+    updateHUD();
+    setTimeout(()=>{busy=false;resetKick();},1050);
+  } else {
+    if(mode==="kids"){
+      toast("おしい！ もういっかいチャレンジ 💪");
+      updateHUD();
+      setTimeout(()=>{busy=false;resetKick();},1050);
+    } else {
+      gameOver();
+    }
+  }
+}
+
+function gameOver(){
+  updateHUD();
+  const best=saveScore(score,streak);
+  setTimeout(()=>{
+    $("sub").textContent="ゲームオーバー！ スコア "+score+"（"+streak+"れんぞく）";
+    toast(best.newBest?("🏆 自己ベスト更新！ "+score+"点"):("スコア "+score+"点。もう1回！"));
+    streak=0; score=0; history=[]; updateHUD(); renderBest(); renderLB();
+    busy=false; resetKick(true);
+    $("actBtn").textContent="①ねらう場所をタップ →";
+  },1100);
+}
+
+/* ===== HUD・保存・ランキング ===== */
+function updateHUD(){ $("h-streak").textContent=streak; $("h-score").textContent=score; renderBest(); }
+function lbData(){ try{return JSON.parse(localStorage.getItem("wc_pk_scores")||"{}");}catch(e){return {};} }
+function renderBest(){ const d=lbData(); $("h-best").textContent=(d[player]&&d[player].score)||0; }
+function saveScore(sc,st){
+  const d=lbData(); const cur=d[player]||{score:0,streak:0}; let nb=false;
+  if(sc>cur.score){ cur.score=sc; nb=true; } if(st>cur.streak) cur.streak=st;
+  d[player]=cur; localStorage.setItem("wc_pk_scores",JSON.stringify(d));
+  // トップページ表示用に家族全体ベストも保存
+  let top={p:"",score:0}; PLAYERS.forEach(p=>{ if(d[p]&&d[p].score>top.score) top={p,score:d[p].score}; });
+  localStorage.setItem("wc_pk_top",JSON.stringify(top));
+  return {newBest:nb};
+}
+function renderLB(){
+  const d=lbData();
+  const rows=PLAYERS.map(p=>({p,score:(d[p]&&d[p].score)||0,streak:(d[p]&&d[p].streak)||0}))
+    .sort((a,b)=>b.score-a.score);
+  let html="<tr><th>順位</th><th>プレイヤー</th><th>ベスト点</th><th>最高連続</th></tr>";
+  rows.forEach((r,i)=>{
+    const crown=i===0&&r.score>0?'<span class="crown">👑</span> ':'';
+    html+='<tr><td>'+(i+1)+'</td><td class="'+(r.p===player?'me':'')+'">'+crown+r.p+'</td><td>'+r.score+'</td><td>'+r.streak+'</td></tr>';
+  });
+  $("lb").innerHTML=html;
+}
+
+/* ===== 演出 ===== */
+let toastT=null;
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),1800); }
+function confetti(){
+  const s=$("stadium")||document.querySelector(".stadium");
+  for(let i=0;i<14;i++){
+    const c=document.createElement("div");
+    const e=["🎉","✨","⚽","🥳","🎊"][i%5];
+    c.textContent=e; c.style.position="absolute"; c.style.left=(10+Math.random()*80)+"%"; c.style.top="40%";
+    c.style.fontSize=(14+Math.random()*14)+"px"; c.style.zIndex=8; c.style.pointerEvents="none";
+    c.style.transition="all 1s ease"; s.appendChild(c);
+    requestAnimationFrame(()=>{ c.style.top=(80+Math.random()*15)+"%"; c.style.opacity="0";
+      c.style.transform="rotate("+(Math.random()*360)+"deg)"; });
+    setTimeout(()=>c.remove(),1050);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
